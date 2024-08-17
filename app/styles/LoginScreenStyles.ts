@@ -5,52 +5,68 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
+    backgroundColor: "#e6e6e6",
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 50,
   },
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#000",
+    width: 150,
+    height: 150,
+    marginBottom: 15,
   },
   input: {
     backgroundColor: "#fff",
-    padding: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
     borderRadius: 8,
     marginBottom: 20,
     fontSize: 16,
-    flex: 1,
+    width: 300, // Tamanho fixo para o campo de entrada
+    alignSelf: "center",
+    textAlign: "left", // Alinha o texto à esquerda
   },
   passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    position: "relative", // Torna o contêiner de senha o referencial para o ícone
     backgroundColor: "#fff",
-    padding: 10,
     borderRadius: 8,
     marginBottom: 20,
+    width: 300, // Tamanho fixo para o campo de senha
+    alignSelf: "center",
+    justifyContent: "center",
+  },
+  passwordInput: {
+    paddingVertical: 12,
+    paddingRight: 50, // Adiciona espaço suficiente para o ícone dentro do campo de senha
+    paddingLeft: 15, // Padding à esquerda consistente com o campo de usuário
+    fontSize: 16,
+    textAlign: "left", // Alinha o texto à esquerda
+  },
+  iconContainer: {
+    position: "absolute",
+    right: 15, // Posiciona o ícone à direita, dentro do campo de senha
+    top: "50%",
+    transform: [{ translateY: -12 }], // Centraliza verticalmente o ícone dentro do campo
   },
   forgotPassword: {
-    color: "#666",
+    color: "#007bff",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 30,
+    textDecorationLine: "underline",
   },
   button: {
     backgroundColor: "#007bff",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 15,
+    width: 300,
+    alignSelf: "center",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });

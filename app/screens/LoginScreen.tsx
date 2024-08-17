@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
-import styles from "../styles/LoginScreenStyles"; // Importa o arquivo de estilização separado
+import styles from "../styles/LoginScreenStyles"; // Certifique-se de ajustar o caminho
 
 const LoginScreen = () => {
   const [password, setPassword] = useState("");
@@ -13,10 +12,10 @@ const LoginScreen = () => {
   };
 
   return (
-    <LinearGradient colors={["#f2f2f2", "#d9d9d9"]} style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../assets/images/logo.png")}
+          source={require("../../assets/images/logo.png")} // Ajuste o caminho da imagem de acordo
           style={styles.logo}
         />
       </View>
@@ -27,11 +26,14 @@ const LoginScreen = () => {
         <TextInput
           placeholder="Senha"
           secureTextEntry={!showPassword}
-          style={styles.input}
+          style={styles.passwordInput}
           value={password}
           onChangeText={setPassword}
         />
-        <TouchableOpacity onPress={togglePasswordVisibility}>
+        <TouchableOpacity
+          onPress={togglePasswordVisibility}
+          style={styles.iconContainer}
+        >
           <MaterialIcons
             name={showPassword ? "visibility" : "visibility-off"}
             size={24}
@@ -51,7 +53,7 @@ const LoginScreen = () => {
       <TouchableOpacity style={[styles.button, { backgroundColor: "#0066cc" }]}>
         <Text style={styles.buttonText}>Fazer login</Text>
       </TouchableOpacity>
-    </LinearGradient>
+    </View>
   );
 };
 
