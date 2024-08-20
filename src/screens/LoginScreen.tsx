@@ -20,15 +20,18 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     <View style={styles.container}>
       <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Usuário"
-        value={username}
-        onChangeText={setUsername}
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Usuário"
+          value={username}
+          onChangeText={setUsername}
+        />
+      </View>
+
       <View style={styles.passwordContainer}>
         <TextInput
-          style={styles.input}  // Usando o mesmo estilo do input de usuário
+          style={styles.input}
           placeholder="Senha"
           secureTextEntry={secureTextEntry}
           value={password}
@@ -38,15 +41,18 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.eyeIcon}
           onPress={() => setSecureTextEntry(!secureTextEntry)}
         >
-          <Text>{secureTextEntry ? '👁️' : '🙈'}</Text>
+          <Text style={styles.eyeIconText}>{secureTextEntry ? '👁️' : '🙈'}</Text>
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity onPress={() => {}}>
         <Text style={styles.forgotPasswordText}>Esqueci a senha</Text>
       </TouchableOpacity>
+
       <View style={styles.buttonContainer}>
         <Button title="Cadastrar-se" onPress={() => navigation.navigate('Register')} color="#007bff" />
       </View>
+
       <View style={[styles.buttonContainer, styles.loginButton]}>
         <Button title="Fazer login" onPress={handleLogin} color="#0056b3" />
       </View>
