@@ -1,8 +1,6 @@
-import React from "react";
-import AppNavigator from "./components/navigation/AppNavigator"; // Importa o stack navigator definido
+import React from 'react';
+import RootNavigator from './src/navigation/RootNavigator';
 
-const App = () => {
-  return <AppNavigator />; // Usa o stack navigator para gerenciar as telas
-};
-
-export default App;
+export default function App() {
+  return <RootNavigator />;
+}
