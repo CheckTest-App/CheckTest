@@ -1,24 +1,47 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+// screens/LoginScreen.tsx
+
+import React, { useContext, useState } from "react";
+import { View, TextInput, TouchableOpacity, Text, Image } from "react-native";
+import { UserContext } from "../contexts/UserContext";
 import { LoginScreenNavigationProp } from "../navigation/types";
 import styles from "../styles/LoginScreen.styles";
 
+// Tipagem das props que o componente receberá
 type Props = {
   navigation: LoginScreenNavigationProp;
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  // Estados para gerenciar o nome de usuário, senha e a visibilidade da senha
+  // Acessa o contexto de usuário
+  const userContext = useContext(UserContext);
+
+  // Verifica se o contexto está definido
+  if (!userContext) {
+    throw new Error("UserContext must be used within a UserProvider");
+  }
+
+  // Desestrutura a lista de usuários do contexto
+  const { users } = userContext;
+
+  // Definição dos estados locais para armazenar os valores dos inputs
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  // Função para lidar com o login
+  // Função para lidar com o login do usuário
   const handleLogin = () => {
-    // Aqui você pode adicionar a lógica de autenticação
+    const user = users.find(
+      (u: { username: string; password: string }) =>
+        u.username === username && u.password === password
+    );
 
-    // Se a autenticação for bem-sucedida, navegue para a tela de upload de imagens
-    navigation.navigate("ImageUpload");
+    if (user) {
+      // Navega para a tela de upload de imagens se a autenticação for bem-sucedida
+      navigation.navigate("ImageUpload");
+    } else {
+      // Mostra um alerta se o nome de usuário ou senha estiverem incorretos
+      alert("Nome de usuário ou senha incorretos!");
+    }
   };
 
   return (
@@ -36,21 +59,20 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           placeholder="Usuário"
           value={username}
           onChangeText={setUsername}
-          placeholderTextColor="#6c757d" // Cor do texto de placeholder
+          placeholderTextColor="#6c757d"
         />
       </View>
 
-      {/* Campo de entrada para a senha */}
+      {/* Campo de entrada para a senha com opção de visibilidade */}
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
           placeholder="Senha"
-          secureTextEntry={secureTextEntry} // Controla a visibilidade da senha
+          secureTextEntry={secureTextEntry}
           value={password}
           onChangeText={setPassword}
           placeholderTextColor="#6c757d"
         />
-        {/* Ícone para mostrar/ocultar a senha */}
         <TouchableOpacity
           style={styles.eyeIcon}
           onPress={() => setSecureTextEntry(!secureTextEntry)}
@@ -76,10 +98,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Botão para fazer login com cor azul escuro */}
+      {/* Botão para fazer login */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, styles.darkBlueButton]} // Aplica o estilo adicional azul escuro
+          style={[styles.button, styles.darkBlueButton]}
           onPress={handleLogin}
         >
           <Text style={styles.buttonText}>Fazer login</Text>

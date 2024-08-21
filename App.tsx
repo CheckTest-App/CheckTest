@@ -1,8 +1,17 @@
-import React from "react";
-import RootNavigator from "./src/navigation/RootNavigator"; // Importa o RootNavigator para gerenciar a navegação
+// App.tsx
 
-// Componente principal do aplicativo
-export default function App() {
-  // Retorna o RootNavigator, que contém toda a lógica de navegação do app
-  return <RootNavigator />;
-}
+import React from "react";
+import { UserProvider } from "./src/contexts/UserContext"; // Importa o UserProvider que envolve o contexto de usuário
+import AppNavigator from "./src/navigation/RootNavigator"; // Importa o componente de navegação principal da aplicação
+
+const App: React.FC = () => {
+  return (
+    // Envolve a aplicação com o UserProvider para fornecer o contexto de usuários a todos os componentes
+    <UserProvider>
+      {/* O AppNavigator gerencia a navegação da aplicação */}
+      <AppNavigator />
+    </UserProvider>
+  );
+};
+
+export default App;

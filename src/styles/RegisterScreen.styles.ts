@@ -1,3 +1,5 @@
+// styles/RegisterScreen.styles.ts
+
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
@@ -9,25 +11,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9ecef", // Define uma cor de fundo clara e neutra
   },
   logo: {
-    width: 150, // Define a largura do logo
-    height: 150, // Define a altura do logo
-    marginBottom: 40, // Adiciona um espaço abaixo do logo
-    borderRadius: 25, // Bordas arredondadas para o logo
+    width: 120, // Ajustado para evitar cortes
+    height: 120, // Ajustado para evitar cortes
+    marginBottom: 30, // Reduzida a margem inferior para menos espaço
+    borderRadius: 60, // Ajustado para o novo tamanho
     overflow: "hidden", // Garante que o conteúdo do logo não ultrapasse suas bordas
     resizeMode: "contain", // Garante que o logo mantenha suas proporções sem distorção
   },
   logoText: {
-    fontSize: 28, // Define o tamanho da fonte do texto do logo
+    fontSize: 24, // Ajustado o tamanho da fonte para melhor equilíbrio visual
     fontWeight: "bold", // Define o texto do logo como negrito
     textAlign: "center", // Centraliza o texto do logo horizontalmente
-    marginBottom: 40, // Adiciona um espaço abaixo do texto do logo
+    marginBottom: 20, // Reduzida a margem inferior para menos espaço
     color: "#343a40", // Define a cor do texto do logo como um cinza escuro
   },
   inputContainer: {
     flexDirection: "row", // Organiza os itens em linha
     alignItems: "center", // Alinha os itens verticalmente no centro
     width: "100%", // Ocupa 100% da largura disponível
-    marginBottom: 15, // Adiciona espaço abaixo do campo de entrada
+    marginBottom: 10, // Reduzido o espaço abaixo do campo de entrada
     borderColor: "#adb5bd", // Cor da borda do campo de entrada
     borderWidth: 1, // Largura da borda do campo de entrada
     borderRadius: 8, // Bordas arredondadas para um visual mais suave
@@ -36,10 +38,10 @@ const styles = StyleSheet.create({
     elevation: 2, // Sombra para destacar o campo de entrada
   },
   passwordContainer: {
-    flexDirection: "row", // Organiza os itens em linha, semelhante a `inputContainer`
+    flexDirection: "row", // Organiza os itens em linha, semelhante a inputContainer
     alignItems: "center", // Alinha os itens verticalmente no centro
     width: "100%", // Ocupa 100% da largura disponível
-    marginBottom: 15, // Adiciona espaço abaixo do campo de entrada
+    marginBottom: 10, // Reduzido o espaço abaixo do campo de entrada
     borderColor: "#adb5bd", // Cor da borda do campo de entrada
     borderWidth: 1, // Largura da borda do campo de entrada
     borderRadius: 8, // Bordas arredondadas para um visual mais suave
@@ -49,8 +51,9 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1, // O campo de entrada ocupa todo o espaço disponível
-    paddingVertical: 10, // Espaçamento vertical dentro do campo de entrada
+    paddingVertical: 8, // Reduzido o padding vertical para campos mais compactos
     color: "#495057", // Cor do texto dentro do campo de entrada
+    fontSize: 16, // Tamanho da fonte consistente
   },
   eyeIcon: {
     justifyContent: "center", // Centraliza o ícone verticalmente
@@ -58,7 +61,7 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Adiciona espaço à esquerda do ícone
   },
   eyeIconText: {
-    fontSize: 18, // Tamanho da fonte do ícone de olho
+    fontSize: 18, // Tamanho da fonte do ícone de olho ajustado
     color: "#495057", // Cor do ícone de olho
   },
   errorText: {
@@ -69,8 +72,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: "100%", // Define a largura do contêiner do botão como 100% da largura disponível
+    marginTop: 20, // Reduzido o espaçamento acima dos botões
     marginBottom: 15, // Espaço abaixo de cada botão
-    marginTop: 10, // Espaçamento acima dos botões
     borderRadius: 8, // Bordas arredondadas para o contêiner do botão
   },
   button: {
@@ -82,8 +85,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff", // Cor do texto dentro do botão
-    fontSize: 16, // Tamanho da fonte do texto
+    fontSize: 16, // Ajustado o tamanho da fonte
     fontWeight: "bold", // O texto dentro do botão é negrito
+  },
+  buttonDisabled: {
+    backgroundColor: "#b0c4de", // Cor mais clara para indicar que o botão está desabilitado
   },
   loginButton: {
     marginTop: 10, // Espaçamento acima do botão de login

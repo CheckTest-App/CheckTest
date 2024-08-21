@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { UserContext } from "../contexts/UserContext";
 import { RegisterScreenNavigationProp } from "../navigation/types";
 import styles from "../styles/RegisterScreen.styles";
 
@@ -15,7 +16,15 @@ type Props = {
 };
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
-  // Estados para gerenciar as entradas do usuário e visibilidade da senha
+  const userContext = useContext(UserContext);
+
+  // Verifica se o contexto está definido
+  if (!userContext) {
+    throw new Error("UserContext must be used within a UserProvider");
+  }
+
+  const { addUser } = userContext;
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -24,7 +33,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  // Estado para armazenar mensagens de erro para cada campo
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -34,25 +42,22 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     confirmPassword: "",
   });
 
-  // Validação de Email
-  const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  // Validação de Telefone
+  // Funções de validação
+  const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
   const validatePhone = (phone: string) =>
     /^\(\d{2}\) \d{5}-\d{4}$/.test(phone);
 
-  // Formatação do Telefone
   const formatPhone = (phone: string) => {
     const cleaned = phone.replace(/\D/g, "");
     const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
     return match ? `(${match[1]}) ${match[2]}-${match[3]}` : phone;
   };
 
-  // Validação de Força da Senha
   const validatePasswordStrength = (password: string) =>
     password.length >= 8 && /\d/.test(password) && /[A-Za-z]/.test(password);
 
-  // Validação do Nome
   const validateName = (name: string) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -61,7 +66,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setName(name);
   };
 
-  // Validação do Email
   const validateEmailInput = (email: string) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -70,7 +74,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setEmail(email);
   };
 
-  // Validação do Telefone
   const validatePhoneInput = (phone: string) => {
     const formattedPhone = formatPhone(phone);
     setErrors((prevErrors) => ({
@@ -82,7 +85,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setPhone(formattedPhone);
   };
 
-  // Validação do Nome de Usuário
   const validateUsername = (username: string) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -91,7 +93,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setUsername(username);
   };
 
-  // Validação da Senha
   const validatePasswordInput = (password: string) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -102,7 +103,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setPassword(password);
   };
 
-  // Validação da Confirmação de Senha
   const validateConfirmPassword = (confirmPassword: string) => {
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -112,10 +112,29 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     setConfirmPassword(confirmPassword);
   };
 
-  // Função para lidar com o processo de registro
+  const validateForm = () => {
+    const isValid =
+      name.trim() !== "" &&
+      validateEmail(email) &&
+      validatePhone(phone) &&
+      username.trim() !== "" &&
+      validatePasswordStrength(password) &&
+      password === confirmPassword &&
+      !Object.values(errors).some((error) => error !== "");
+
+    setIsButtonDisabled(!isValid);
+  };
+
+  useEffect(() => {
+    validateForm(); // Valida o formulário sempre que um campo é atualizado
+  }, [name, email, phone, username, password, confirmPassword, errors]);
+
   const handleRegister = () => {
-    if (!Object.values(errors).some((error) => error !== "")) {
+    if (!isButtonDisabled) {
+      const newUser = { name, email, phone, username, password };
+      addUser(newUser); // Adiciona o novo usuário ao contexto
       alert("Usuário registrado com sucesso!");
+      navigation.navigate("Login");
     }
   };
 
@@ -204,8 +223,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         <Text style={styles.errorText}>{errors.password}</Text>
       )}
 
-      {/* Campo de entrada para confirmação da senha */}
-      <View style={styles.inputContainer}>
+      {/* Campo de entrada para confirmação da senha com visualizador */}
+      <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
           placeholder="Confirmar Senha"
@@ -214,14 +233,26 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           onChangeText={validateConfirmPassword}
           placeholderTextColor="#6c757d"
         />
-        {errors.confirmPassword && (
-          <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-        )}
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setSecureTextEntry(!secureTextEntry)}
+        >
+          <Text style={styles.eyeIconText}>
+            {secureTextEntry ? "👁️" : "🙈"}
+          </Text>
+        </TouchableOpacity>
       </View>
+      {errors.confirmPassword && (
+        <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+      )}
 
       {/* Botão para registrar o usuário */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <TouchableOpacity
+          style={[styles.button, isButtonDisabled && styles.buttonDisabled]}
+          onPress={handleRegister}
+          disabled={isButtonDisabled}
+        >
           <Text style={styles.buttonText}>Registrar</Text>
         </TouchableOpacity>
       </View>
