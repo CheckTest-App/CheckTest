@@ -1,65 +1,62 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: "#f2f2f2",
   },
   logo: {
     width: 150,
     height: 150,
     marginBottom: 40,
-    borderRadius: 20,
-    overflow: 'hidden',
+    borderRadius: 25,
+    overflow: "hidden",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
     marginBottom: 15,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 10,
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
     marginBottom: 15,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: 10,
   },
   input: {
     flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 10, // Adicionado para consistência
-    borderRadius: 8, // Garantir que o input tenha bordas arredondadas
-    backgroundColor: '#fff',
   },
   eyeIcon: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 10, // Espaço entre o ícone e o campo de senha
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10,
   },
   eyeIconText: {
     fontSize: 18,
-    color: '#000', // Cor do ícone para garantir visibilidade
   },
-  forgotPasswordText: {
-    color: '#6c757d',
-    marginBottom: 20,
-    textAlign: 'center',
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 5,
   },
   buttonContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 15,
   },
   loginButton: {
