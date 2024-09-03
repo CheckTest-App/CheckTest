@@ -3,109 +3,218 @@ import {
   Image,
   View,
   ScrollView,
-  Alert,
   TouchableOpacity,
   Text,
+  Modal,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
+import CustomAlert from "../screens/CustomAlert";
 import styles from "../styles/TestUploadScreen.styles";
 
-const MultipleImageUploadScreen = () => {
-  // Estado para armazenar os URIs das imagens selecionadas
-  const [imageUris, setImageUris] = useState<string[]>([]);
+const { width: screenWidth } = Dimensions.get("window");
+const IMAGES_PER_PAGE = 6;
 
-  // Hook de navegação, tipado corretamente com RootStackParamList
+const MultipleImageUploadScreen = () => {
+  const [imageUris, setImageUris] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{
+    title: string;
+    message: string;
+    buttons?: {
+      text: string;
+      onPress: () => void;
+      style?: "default" | "cancel" | "destructive";
+    }[];
+  }>({ title: "", message: "" });
+
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // Função para selecionar múltiplas imagens da galeria
   const selectImages = async () => {
-    // Solicita permissão para acessar a galeria de imagens
-    let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!result.granted) {
-      Alert.alert(
-        "Permissão necessária",
-        "Permissão para acessar a galeria é necessária!"
-      );
+      setAlertData({
+        title: "Permissão necessária",
+        message: "Permissão para acessar a galeria é necessária!",
+      });
+      setAlertVisible(true);
       return;
     }
 
-    // Abre a galeria de imagens para seleção de múltiplas imagens
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true, // Permite a seleção de múltiplas imagens
-      quality: 1, // Define a qualidade das imagens
+      allowsMultipleSelection: true,
+      quality: 1,
     });
 
-    // Verifica se imagens foram selecionadas e armazena seus URIs
-    if (
-      !pickerResult.canceled &&
-      pickerResult.assets &&
-      pickerResult.assets.length > 0
-    ) {
-      const newUris = pickerResult.assets.map((asset) => asset.uri);
-      setImageUris([...imageUris, ...newUris]); // Adiciona as novas imagens ao estado
+    if (!pickerResult.canceled && pickerResult.assets) {
+      const newUris: string[] = [];
+
+      pickerResult.assets.forEach((asset) => {
+        if (!imageUris.includes(asset.uri)) {
+          newUris.push(asset.uri);
+        }
+      });
+
+      if (newUris.length < pickerResult.assets.length) {
+        setAlertData({
+          title: "Imagem duplicada",
+          message:
+            "Algumas imagens já foram selecionadas e não foram adicionadas novamente.",
+        });
+        setAlertVisible(true);
+      }
+
+      setImageUris([...imageUris, ...newUris]);
     }
   };
 
-  // Função para navegar para a tela de correção de provas
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index + currentPage * IMAGES_PER_PAGE);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
   const handleNavigateToCorrectScreen = () => {
-    Alert.alert(
-      "Inserir Mais Provas",
-      "Deseja inserir mais provas?",
-      [
+    setAlertData({
+      title: "Inserir Mais Provas",
+      message: "Deseja inserir mais provas?",
+      buttons: [
         {
           text: "Não",
           onPress: () => navigation.navigate("CorrectScreen"),
           style: "destructive",
         },
-        {
-          text: "Sim",
-          onPress: () => {},
-          style: "default",
-        },
+        { text: "Sim", onPress: () => {}, style: "default" },
       ],
-      { cancelable: true } // Permite cancelar o alerta tocando fora dele
-    );
+    });
+    setAlertVisible(true);
+  };
+
+  const handleNextPage = () => {
+    if ((currentPage + 1) * IMAGES_PER_PAGE < imageUris.length) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleScroll = (event: any) => {
+    const index = Math.floor(event.nativeEvent.contentOffset.x / screenWidth);
+    setSelectedImageIndex(index);
+  };
+
+  const renderPaginationButtons = () => {
+    if (imageUris.length > IMAGES_PER_PAGE) {
+      return (
+        <View style={styles.paginationContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.paginationButton]}
+            onPress={handlePreviousPage}
+            disabled={currentPage === 0}
+          >
+            <Text style={styles.buttonText}>Anterior</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.paginationButton]}
+            onPress={handleNextPage}
+            disabled={(currentPage + 1) * IMAGES_PER_PAGE >= imageUris.length}
+          >
+            <Text style={styles.buttonText}>Próxima</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return null;
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Exibe o logo da aplicação */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertData.title}
+        message={alertData.message}
+        onClose={() => setAlertVisible(false)}
+        buttons={alertData.buttons}
+      />
+
       <Image
         source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
-      {/* Botão para selecionar múltiplas imagens */}
       <TouchableOpacity style={styles.button} onPress={selectImages}>
         <Text style={styles.buttonText}>Inserir Provas</Text>
       </TouchableOpacity>
 
-      {/* Contêiner para exibir as imagens selecionadas */}
       <View style={styles.imageContainer}>
-        {imageUris.map((uri, index) => (
-          <Image
-            key={index}
-            source={{ uri: uri }}
-            style={styles.uploadedImage}
-          />
-        ))}
+        {imageUris
+          .slice(
+            currentPage * IMAGES_PER_PAGE,
+            (currentPage + 1) * IMAGES_PER_PAGE
+          )
+          .map((uri, index) => (
+            <TouchableOpacity key={index} onPress={() => openImageModal(index)}>
+              <Image source={{ uri: uri }} style={styles.uploadedImage} />
+            </TouchableOpacity>
+          ))}
       </View>
 
-      {/* Botão para navegar para a tela de correção de provas com cor azul escuro */}
+      {imageUris.length > 0 && renderPaginationButtons()}
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalContainer}>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleScroll}
+            contentOffset={{ x: selectedImageIndex * screenWidth, y: 0 }}
+          >
+            {imageUris.map((uri, index) => (
+              <Image
+                key={index}
+                source={{ uri: uri }}
+                style={styles.fullScreenImage}
+              />
+            ))}
+          </ScrollView>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={handleCloseModal}
+          >
+            <Text style={styles.closeButtonText}>Fechar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
       <TouchableOpacity
-        style={[styles.button, styles.darkBlueButton]} // Aplica o estilo azul escuro adicionalmente
+        style={[styles.button, styles.darkBlueButton]}
         onPress={handleNavigateToCorrectScreen}
       >
         <Text style={styles.buttonText}>Ir para Corrigir Provas</Text>
       </TouchableOpacity>
 
-      {/* Botão para voltar para a tela de gabarito com um tom de vermelho claro */}
       <TouchableOpacity
-        style={[styles.button, styles.lightRedButton]} // Aplica o estilo vermelho claro adicionalmente
+        style={[styles.button, styles.lightRedButton]}
         onPress={() => navigation.navigate("TemplateUploadScreen")}
       >
         <Text style={styles.buttonText}>Voltar para Gabarito</Text>

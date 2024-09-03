@@ -1,46 +1,68 @@
-import React, { useState } from "react";
-import { View, Image, Alert, TouchableOpacity, Text } from "react-native";
+import React, { useContext, useState } from "react";
+import { View, Image, TouchableOpacity, Text } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
+import { UserContext } from "../contexts/UserContext";
+import CustomAlert from "../screens/CustomAlert";
 import styles from "../styles/CorretScreen.style";
 
+type AlertButton = {
+  text: string;
+  onPress: () => void;
+  style?: "default" | "cancel" | "destructive";
+};
+
 const HomeScreen = () => {
-  // Hook para navegação, tipado corretamente com RootStackParamList
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const userContext = useContext(UserContext);
 
-  // Estado para simular a obtenção do email do banco de dados
-  const [email] = useState<string>("usuario@exemplo.com");
-
-  // Função para lidar com o envio de provas por e-mail
-  const handleSendEmail = () => {
-    Alert.alert(
-      "Enviar Provas por E-mail",
-      `Deseja enviar as provas para o e-mail: ${email}?`,
-      [
-        {
-          text: "Enviar",
-          onPress: () => alert("Provas enviadas para o e-mail!"),
-          style: "default",
-        },
-        {
-          text: "Cancelar",
-          onPress: () => console.log("Envio cancelado"),
-          style: "destructive",
-        },
-      ],
-      { cancelable: true } // Permite cancelar o alerta tocando fora dele
+  if (!userContext) {
+    throw new Error(
+      "UserContext não está definido. Verifique se o UserProvider está envolvido ao redor de seu aplicativo."
     );
+  }
+
+  const email = userContext.users.length
+    ? userContext.users[0].email
+    : "email@exemplo.com";
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState<{
+    title: string;
+    message: string;
+    buttons: AlertButton[];
+  }>({
+    title: "",
+    message: "",
+    buttons: [],
+  });
+
+  const handleSendEmail = () => {
+    setAlertData({
+      title: "Envio de Provas",
+      message: `Provas enviadas para o e-mail: ${email}`,
+      buttons: [{ text: "OK", onPress: () => setAlertVisible(false) }],
+    });
+    setAlertVisible(true);
   };
 
-  // Função para lidar com o logout do usuário
+  const handleCorrectTests = () => {
+    setAlertData({
+      title: "Provas Corrigidas",
+      message: "As provas foram corrigidas com sucesso!",
+      buttons: [{ text: "OK", onPress: () => setAlertVisible(false) }],
+    });
+    setAlertVisible(true);
+  };
+
   const handleLogout = () => {
-    Alert.alert(
-      "Logout",
-      "Você tem certeza que deseja sair?",
-      [
+    setAlertData({
+      title: "Logout",
+      message: "Você tem certeza que deseja sair?",
+      buttons: [
         {
           text: "Cancelar",
-          onPress: () => console.log("Logout cancelado"),
+          onPress: () => setAlertVisible(false),
           style: "cancel",
         },
         {
@@ -48,35 +70,37 @@ const HomeScreen = () => {
           onPress: () => {
             navigation.reset({
               index: 0,
-              routes: [{ name: "Login" }], // Reseta a pilha de navegação e volta para a tela de login
+              routes: [{ name: "Login" }],
             });
           },
-          style: "destructive", // Estilo do botão vermelho para indicar ação crítica
+          style: "destructive",
         },
       ],
-      { cancelable: true } // Permite cancelar o alerta tocando fora dele
-    );
+    });
+    setAlertVisible(true);
   };
 
   return (
     <View style={styles.container}>
-      {/* Exibe o logo da aplicação */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertData.title}
+        message={alertData.message}
+        onClose={() => setAlertVisible(false)}
+        buttons={alertData.buttons}
+      />
+
       <Image
         source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
-      {/* Botão para navegar para a tela de correção de provas */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("TestUploadScreen")}
-        >
+        <TouchableOpacity style={styles.button} onPress={handleCorrectTests}>
           <Text style={styles.buttonText}>Corrigir Provas</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Botão para acionar o envio de provas por e-mail com cor verde claro */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.emailButton]}
@@ -86,7 +110,6 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Botão para voltar para a tela de envio de provas com um tom de vermelho claro */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.backButton]}
@@ -96,7 +119,6 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Botão de logout */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.logoutButton]}

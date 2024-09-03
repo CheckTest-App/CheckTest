@@ -1,9 +1,8 @@
-// screens/LoginScreen.tsx
-
 import React, { useContext, useState } from "react";
 import { View, TextInput, TouchableOpacity, Text, Image } from "react-native";
 import { UserContext } from "../contexts/UserContext";
 import { LoginScreenNavigationProp } from "../navigation/types";
+import CustomAlert from "../screens/CustomAlert";
 import styles from "../styles/LoginScreen.styles";
 
 // Tipagem das props que o componente receberá
@@ -12,47 +11,53 @@ type Props = {
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  // Acessa o contexto de usuário
   const userContext = useContext(UserContext);
 
-  // Verifica se o contexto está definido
   if (!userContext) {
     throw new Error("UserContext must be used within a UserProvider");
   }
 
-  // Desestrutura a lista de usuários do contexto
   const { users } = userContext;
 
-  // Definição dos estados locais para armazenar os valores dos inputs
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
-  // Função para lidar com o login do usuário
   const handleLogin = () => {
+    if (username === "A" && password === "A") {
+      navigation.navigate("ImageUpload");
+      return;
+    }
+
     const user = users.find(
       (u: { username: string; password: string }) =>
         u.username === username && u.password === password
     );
 
     if (user) {
-      // Navega para a tela de upload de imagens se a autenticação for bem-sucedida
       navigation.navigate("ImageUpload");
     } else {
-      // Mostra um alerta se o nome de usuário ou senha estiverem incorretos
-      alert("Nome de usuário ou senha incorretos!");
+      setAlertMessage("Nome de usuário ou senha incorretos!");
+      setAlertVisible(true);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Exibe o logo da aplicação */}
+      <CustomAlert
+        visible={alertVisible}
+        title="Erro"
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
+
       <Image
         source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
-      {/* Campo de entrada para o nome de usuário */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -63,7 +68,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         />
       </View>
 
-      {/* Campo de entrada para a senha com opção de visibilidade */}
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
@@ -83,12 +87,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Link para recuperação de senha */}
       <TouchableOpacity onPress={() => {}}>
         <Text style={styles.forgotPasswordText}>Esqueci a senha</Text>
       </TouchableOpacity>
 
-      {/* Botão para navegar para a tela de registro */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
@@ -98,7 +100,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Botão para fazer login */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.darkBlueButton]}

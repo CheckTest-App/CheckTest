@@ -1,45 +1,46 @@
 import React, { useState } from "react";
-import { View, Image, TouchableOpacity, Text, Alert } from "react-native";
+import { View, Image, TouchableOpacity, Text, Modal } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
+import CustomAlert from "../screens/CustomAlert";
 import styles from "../styles/TemplateUploadScreen.styles";
 
 const ImageUploadScreen = () => {
-  // Estado para armazenar o URI da imagem selecionada
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertData, setAlertData] = useState({ title: "", message: "" });
 
-  // Hook de navegação, tipado corretamente com RootStackParamList
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // Função para selecionar a imagem da galeria
   const selectImage = async () => {
-    // Solicita permissão para acessar a galeria de imagens
-    let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!result.granted) {
-      Alert.alert(
-        "Permissão necessária",
-        "Permissão para acessar a galeria é necessária!"
-      );
+      setAlertData({
+        title: "Permissão necessária",
+        message: "Permissão para acessar a galeria é necessária!",
+      });
+      setAlertVisible(true);
       return;
     }
 
-    // Verifica se uma imagem já foi selecionada
     if (imageUri) {
-      Alert.alert("Limite atingido", "Você só pode selecionar uma imagem.");
+      setAlertData({
+        title: "Limite atingido",
+        message: "Você só pode selecionar uma imagem.",
+      });
+      setAlertVisible(true);
       return;
     }
 
-    // Abre a galeria de imagens para seleção
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3], // Define a proporção da imagem
-      quality: 1, // Define a qualidade da imagem
+      allowsEditing: false,
+      quality: 1,
     });
 
-    // Verifica se uma imagem foi selecionada e armazena seu URI
     if (
       !pickerResult.canceled &&
       pickerResult.assets &&
@@ -51,25 +52,49 @@ const ImageUploadScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Exibe o logo da aplicação */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertData.title}
+        message={alertData.message}
+        onClose={() => setAlertVisible(false)}
+      />
+
       <Image
         source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
-      {/* Botão para selecionar a imagem do gabarito */}
       <TouchableOpacity style={styles.button} onPress={selectImage}>
         <Text style={styles.buttonText}>Inserir Gabarito</Text>
       </TouchableOpacity>
 
-      {/* Exibe a imagem selecionada, se houver */}
       {imageUri && (
-        <Image source={{ uri: imageUri }} style={styles.uploadedImage} />
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Image source={{ uri: imageUri }} style={styles.uploadedImage} />
+        </TouchableOpacity>
       )}
 
-      {/* Botão para navegar para a tela de inserção de provas com cor azul escuro */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>Fechar</Text>
+          </TouchableOpacity>
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={styles.fullScreenImage} />
+          )}
+        </View>
+      </Modal>
+
       <TouchableOpacity
-        style={[styles.button, styles.darkBlueButton]} // Aplica o estilo azul escuro adicionalmente
+        style={[styles.button, styles.darkBlueButton]}
         onPress={() => navigation.navigate("TestUploadScreen")}
       >
         <Text style={styles.buttonText}>Ir para inserir provas</Text>
