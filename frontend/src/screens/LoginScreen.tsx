@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
 import { View, TextInput, TouchableOpacity, Text, Image } from "react-native";
-import { UserContext } from "../contexts/UserContext";
-import { LoginScreenNavigationProp } from "../navigation/types";
-import CustomAlert from "./CustomAlert";
-import styles from "../styles/LoginScreen.styles";
+import { UserContext } from "../contexts/UserContext"; // Importa o contexto de usuário para usar os dados de usuário
+import { LoginScreenNavigationProp } from "../navigation/types"; // Tipagem para a navegação
+import CustomAlert from "../components/CustomAlert"; // Componente de alerta customizado para mostrar erros
+import styles from "../styles/LoginScreen.styles"; // Importa os estilos para a tela de login
 
 // Tipagem das props que o componente receberá
 type Props = {
@@ -11,96 +11,118 @@ type Props = {
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
+  // Obtém o contexto do usuário
   const userContext = useContext(UserContext);
 
+  // Verifica se o UserContext está disponível corretamente
   if (!userContext) {
-    throw new Error("UserContext must be used within a UserProvider");
+    throw new Error("UserContext must be used dentro de UserProvider");
   }
 
-  const { users, setLoggedInUser } = userContext;
+  // Desestruturação para pegar a lista de usuários do contexto
+  const { users } = userContext;
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  // Estados para armazenar o nome de usuário, senha, visibilidade do campo de senha, e controle de alertas
+  const [username, setUsername] = useState(""); // Estado para o nome de usuário
+  const [password, setPassword] = useState(""); // Estado para a senha
+  const [secureTextEntry, setSecureTextEntry] = useState(true); // Estado para esconder ou mostrar a senha
+  const [alertVisible, setAlertVisible] = useState(false); // Estado para controlar a visibilidade do alerta
+  const [alertMessage, setAlertMessage] = useState(""); // Estado para armazenar a mensagem de erro no alerta
 
+  // Função que realiza a tentativa de login
   const handleLogin = () => {
+    // Checa se o nome de usuário e senha são "A"
+    if (username === "A" && password === "A") {
+      navigation.navigate("ImageUpload"); // Se as credenciais estiverem corretas, navega para a tela de upload de imagem
+      return;
+    }
+
+    // Busca um usuário na lista de usuários que corresponda ao nome de usuário e senha fornecidos
     const user = users.find(
       (u: { username: string; password: string }) =>
         u.username === username && u.password === password
     );
 
+    // Se o usuário for encontrado, navega para a tela de upload de imagem
     if (user) {
-      // Armazenar o usuário logado no contexto
-      setLoggedInUser(user);
       navigation.navigate("ImageUpload");
     } else {
+      // Caso contrário, exibe uma mensagem de erro e o alerta
       setAlertMessage("Nome de usuário ou senha incorretos!");
-      setAlertVisible(true);
+      setAlertVisible(true); // Torna o alerta visível
     }
   };
 
+  // Retorna o layout da tela de login
   return (
     <View style={styles.container}>
+      {/* Componente de alerta customizado para exibir mensagens de erro */}
       <CustomAlert
-        visible={alertVisible}
-        title="Erro"
-        message={alertMessage}
-        onClose={() => setAlertVisible(false)}
+        visible={alertVisible} // Controla a visibilidade do alerta
+        title="Erro" // Título do alerta
+        message={alertMessage} // Mensagem do alerta (ex: erro de autenticação)
+        onClose={() => setAlertVisible(false)} // Fecha o alerta ao clicar
       />
 
+      {/* Exibe o logo da aplicação */}
       <Image
-        source={require("../../assets/images/logo.png")}
-        style={styles.logo}
+        source={require("../assets/images/logo.png")} // Caminho para o logo
+        style={styles.logo} // Estilo aplicado ao logo
       />
 
+      {/* Campo de entrada para o nome de usuário */}
       <View style={styles.inputContainer}>
         <TextInput
-          style={styles.input}
-          placeholder="Usuário"
-          value={username}
-          onChangeText={setUsername}
-          placeholderTextColor="#6c757d"
+          style={styles.input} // Estilo aplicado ao campo de entrada
+          placeholder="Usuário" // Texto placeholder no campo de entrada
+          value={username} // Valor do campo controlado pelo estado `username`
+          onChangeText={setUsername} // Atualiza o valor de `username` quando o usuário digita
+          placeholderTextColor="#6c757d" // Cor do placeholder
         />
       </View>
 
+      {/* Campo de entrada para a senha */}
       <View style={styles.passwordContainer}>
         <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          secureTextEntry={secureTextEntry}
-          value={password}
-          onChangeText={setPassword}
-          placeholderTextColor="#6c757d"
+          style={styles.input} // Estilo aplicado ao campo de senha
+          placeholder="Senha" // Texto placeholder
+          secureTextEntry={secureTextEntry} // Esconde a senha se `secureTextEntry` for true
+          value={password} // Valor do campo de senha controlado pelo estado `password`
+          onChangeText={setPassword} // Atualiza o valor de `password` quando o usuário digita
+          placeholderTextColor="#6c757d" // Cor do placeholder
         />
+        {/* Botão para alternar entre mostrar ou esconder a senha */}
         <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => setSecureTextEntry(!secureTextEntry)}
+          style={styles.eyeIcon} // Estilo do ícone de olho
+          onPress={() => setSecureTextEntry(!secureTextEntry)} // Alterna a visibilidade da senha
         >
           <Text style={styles.eyeIconText}>
-            {secureTextEntry ? "👁️" : "🙈"}
+            {secureTextEntry ? "👁️" : "🙈"}{" "}
+            {/* Mostra um ícone diferente dependendo do estado */}
           </Text>
         </TouchableOpacity>
       </View>
 
+      {/* Texto "Esqueci a senha" (não tem funcionalidade neste exemplo) */}
       <TouchableOpacity onPress={() => {}}>
         <Text style={styles.forgotPasswordText}>Esqueci a senha</Text>
       </TouchableOpacity>
 
+      {/* Botão para navegar para a tela de cadastro */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Register")}
+          style={styles.button} // Estilo aplicado ao botão
+          onPress={() => navigation.navigate("Register")} // Navega para a tela de cadastro
         >
           <Text style={styles.buttonText}>Cadastrar-se</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Botão para realizar o login */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, styles.darkBlueButton]}
-          onPress={handleLogin}
+          style={[styles.button, styles.darkBlueButton]} // Estilo aplicado ao botão de login
+          onPress={handleLogin} // Chama a função de login quando o botão é clicado
         >
           <Text style={styles.buttonText}>Fazer login</Text>
         </TouchableOpacity>

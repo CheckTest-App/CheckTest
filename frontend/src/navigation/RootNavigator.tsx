@@ -11,9 +11,12 @@ import { RootStackParamList } from "../navigation/types"; // Importa a tipagem d
 // Cria o Stack Navigator tipado corretamente com RootStackParamList
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+// Função principal do componente de navegação
 const RootNavigator = () => {
   return (
+    // Envolve o navegador com o container de navegação
     <NavigationContainer>
+      {/* Cria o Stack Navigator e define a rota inicial como "Login" */}
       <Stack.Navigator initialRouteName="Login">
         {/* Tela de Login */}
         <Stack.Screen name="Login" component={LoginScreen} />
