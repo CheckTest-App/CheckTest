@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const tesseract = require("tesseract.js");
+const Jimp = require("jimp"); // Adicionando Jimp para pré-processamento de imagem
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
@@ -9,10 +10,18 @@ const nodemailer = require("nodemailer");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json()); // Para receber dados em JSON no corpo das requisições
+app.use(express.json());
 
-// Configuração do Multer para upload de múltiplas imagens
 const upload = multer({ dest: "uploads/" });
+
+// Função de pré-processamento de imagem (ajuste de contraste, escala de cinza)
+const preprocessImage = async (filePath) => {
+  const image = await Jimp.read(filePath); // Jimp.read chamado corretamente
+  await image
+    .greyscale() // Converter para escala de cinza
+    .contrast(1) // Aumentar o contraste
+    .writeAsync(filePath); // Salvar a imagem processada
+};
 
 // Rota para correção de prova
 app.post(
@@ -23,14 +32,34 @@ app.post(
     const provaPath = path.join(__dirname, req.files["prova"][0].path);
 
     try {
-      // Extração do texto do gabarito e da prova usando Tesseract
-      const gabaritoResult = await tesseract.recognize(gabaritoPath);
-      const gabaritoTexto = gabaritoResult.data.text;
+      // Pré-processar a imagem
+      await preprocessImage(gabaritoPath);
+      await preprocessImage(provaPath);
 
-      const provaResult = await tesseract.recognize(provaPath);
+      // Opções do Tesseract
+      const tesseractOptions = {
+        tessedit_pageseg_mode: tesseract.PSM.AUTO,
+      };
+
+      // Processar o gabarito e a prova com Tesseract.js
+      const gabaritoResult = await tesseract.recognize(
+        gabaritoPath,
+        "por",
+        tesseractOptions
+      );
+      const provaResult = await tesseract.recognize(
+        provaPath,
+        "por",
+        tesseractOptions
+      );
+
+      const gabaritoTexto = gabaritoResult.data.text;
       const provaTexto = provaResult.data.text;
 
-      // Extrair as respostas do gabarito e da prova
+      console.log("Texto do gabarito:", gabaritoTexto);
+      console.log("Texto da prova:", provaTexto);
+
+      // Extrair respostas
       const gabaritoRespostas = extrairRespostas(gabaritoTexto);
       const provaRespostas = extrairRespostas(provaTexto);
 
@@ -42,7 +71,6 @@ app.post(
 
       res.json({ resultado: resultadoCorrecao });
 
-      // Remover arquivos temporários
       fs.unlinkSync(gabaritoPath);
       fs.unlinkSync(provaPath);
     } catch (error) {
@@ -58,14 +86,10 @@ const extrairRespostas = (texto) => {
   const linhas = texto.split("\n");
 
   linhas.forEach((linha, index) => {
-    if (
-      linha.includes("A)") ||
-      linha.includes("B)") ||
-      linha.includes("C)") ||
-      linha.includes("D)")
-    ) {
-      // Extrai a alternativa marcada (A, B, C, D)
-      const alternativaCorreta = linha.match(/[A-D]\)/)[0].charAt(0);
+    // Melhorar o reconhecimento de alternativas preenchidas
+    const match = linha.match(/●.*([A-D])/);
+    if (match) {
+      const alternativaCorreta = match[1];
       respostas.push({ questao: index + 1, resposta: alternativaCorreta });
     }
   });
@@ -95,10 +119,10 @@ const compararRespostas = (gabaritoRespostas, provaRespostas) => {
 // Função para enviar o e-mail com o resultado
 const enviarEmail = (email, resultadoJson) => {
   let transporter = nodemailer.createTransport({
-    service: "gmail", // Ou outro serviço de e-mail
+    service: "gmail",
     auth: {
-      user: process.env.EMAIL, // Seu e-mail
-      pass: process.env.EMAIL_PASSWORD, // Sua senha de e-mail
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
@@ -113,7 +137,7 @@ const enviarEmail = (email, resultadoJson) => {
 
   let mailOptions = {
     from: process.env.EMAIL,
-    to: email, // E-mail do destinatário
+    to: email,
     subject: "Resultado da Avaliação",
     text: `Segue o resultado da sua prova:\n\n${resultadoTexto}\n\nPontuação Total: ${resultadoJson.pontuacaoTotal} pontos`,
   };
@@ -131,7 +155,6 @@ const enviarEmail = (email, resultadoJson) => {
 app.post("/api/enviar-resultado", (req, res) => {
   const { email, resultado } = req.body;
 
-  // Envia o e-mail com o resultado
   enviarEmail(email, resultado);
 
   res.json({ message: "Resultado enviado com sucesso por e-mail!" });
