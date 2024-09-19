@@ -1,6 +1,6 @@
-import React, { createContext, useState, ReactNode } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Definição do tipo User que representa um usuário
 type User = {
   name: string;
   email: string;
@@ -9,35 +9,53 @@ type User = {
   password: string;
 };
 
-// Definição do tipo do contexto, especificando os dados e funções que ele expõe
 type UserContextType = {
-  users: User[]; // Array de usuários registrados
-  loggedInUser: User | null; // Usuário atualmente logado
-  addUser: (user: User) => void; // Função para adicionar um novo usuário
-  setLoggedInUser: (user: User) => void; // Função para definir o usuário logado
+  users: User[];
+  loggedInUser: User | null;
+  addUser: (user: User) => void;
+  setLoggedInUser: (user: User) => void;
+  loadUsers: () => void;
 };
 
-// Criação do contexto de usuários, com valor inicial undefined
 export const UserContext = createContext<UserContextType | undefined>(
   undefined
 );
 
-// Componente provedor que envolve a aplicação, fornecendo o contexto de usuários
-export const UserProvider: React.FC<{ children: ReactNode }> = ({
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // Estado local que armazena a lista de usuários
   const [users, setUsers] = useState<User[]>([]);
-  const [loggedInUser, setLoggedInUser] = useState<User | null>(null); // Estado para o usuário logado
+  const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
-  // Função que adiciona um novo usuário à lista
-  const addUser = (user: User) => {
-    setUsers((prevUsers) => [...prevUsers, user]);
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    try {
+      const storedUsers = await AsyncStorage.getItem("users");
+      if (storedUsers) {
+        setUsers(JSON.parse(storedUsers));
+      }
+    } catch (error) {
+      console.error("Erro ao carregar usuários", error);
+    }
+  };
+
+  const addUser = async (user: User) => {
+    const updatedUsers = [...users, user];
+    setUsers(updatedUsers);
+    try {
+      await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
+    } catch (error) {
+      console.error("Erro ao salvar usuário", error);
+    }
   };
 
   return (
-    // Provedor do contexto, que passa os valores e funções para os componentes filhos
-    <UserContext.Provider value={{ users, loggedInUser, addUser, setLoggedInUser }}>
+    <UserContext.Provider
+      value={{ users, loggedInUser, addUser, setLoggedInUser, loadUsers }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -9,13 +9,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa", // Define uma cor de fundo suave e clara (cinza claro).
   },
   logo: {
-    width: 150, // Define a largura do logo como 150 unidades.
-    height: 150, // Define a altura do logo como 150 unidades.
-    marginBottom: 40, // Adiciona um espaçamento de 40 unidades abaixo do logo.
-    resizeMode: "contain", // Faz com que o logo mantenha suas proporções ao ser redimensionado.
-    backgroundColor: "#007bff", // Define a cor de fundo azul ao redor do logo.
-    borderRadius: 75, // Define bordas arredondadas para o fundo azul, criando um efeito circular.
-    padding: 20, // Adiciona um espaçamento interno de 20 unidades ao redor do logo para dar margem ao conteúdo.
+    width: 200, // Define a largura do logo como 150 unidades.
+    height: 200, // Define a altura do logo como 150 unidades.
+    resizeMode: "contain", // Faz com que o logo mantenha suas proporções ao ser redimensionado dentro do espaço disponível.
+    marginBottom: 40,
   },
   buttonContainer: {
     width: "80%", // Define a largura do contêiner dos botões como 80% da largura da tela.

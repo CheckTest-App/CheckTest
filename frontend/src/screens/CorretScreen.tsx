@@ -7,6 +7,7 @@ import {
   FlatList,
   ListRenderItem,
 } from "react-native"; // Importa componentes do React Native para criar a interface do usuário
+import logoBase64 from "../assets/logoBase64";
 import { useNavigation, NavigationProp } from "@react-navigation/native"; // Importa useNavigation para navegação e NavigationProp para tipagem das rotas
 import { RootStackParamList } from "../navigation/types"; // Importa tipagem das rotas
 import { UserContext } from "../contexts/UserContext"; // Importa o contexto de usuário para acessar informações globais
@@ -182,7 +183,7 @@ const HomeScreen = () => {
 
       {/* Exibe o logo da aplicação */}
       <Image
-        source={require("../assets/images/logo.png")}
+        source={{ uri: logoBase64 }}
         style={styles.logo}
       />
 

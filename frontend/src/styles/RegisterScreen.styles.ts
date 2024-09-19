@@ -9,13 +9,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9ecef", // Define uma cor de fundo cinza claro para o contêiner.
   },
   logo: {
-    width: 150, // Define a largura do logo como 150 unidades.
-    height: 150, // Define a altura do logo como 150 unidades.
-    marginBottom: 40, // Adiciona um espaçamento de 40 unidades abaixo do logo.
+    width: 200, // Define a largura do logo como 150 unidades.
+    height: 200, // Define a altura do logo como 150 unidades.
     resizeMode: "contain", // Faz com que o logo mantenha suas proporções ao ser redimensionado dentro do espaço disponível.
-    backgroundColor: "#007bff", // Define a cor de fundo azul ao redor do logo.
-    borderRadius: 75, // Define bordas arredondadas para criar um fundo circular ao redor do logo.
-    padding: 20, // Adiciona um espaçamento interno de 20 unidades ao redor do logo para dar margem ao conteúdo dentro do fundo circular.
+    marginBottom: 40,
   },
   inputWrapper: {
     width: "100%", // Faz com que o contêiner do campo de entrada ocupe toda a largura disponível.
@@ -41,7 +38,8 @@ const styles = StyleSheet.create({
     borderRadius: 8, // Define bordas arredondadas para o contêiner de senha.
     backgroundColor: "#fff", // Define o fundo branco para o contêiner de senha.
     paddingHorizontal: 10, // Adiciona um espaçamento interno de 10 unidades nas laterais do contêiner de senha.
-    elevation: 2, // Adiciona uma sombra leve para dar um leve destaque ao contêiner de senha.
+    elevation: 2,
+    marginBottom: 5, // Adiciona uma sombra leve para dar um leve destaque ao contêiner de senha.
   },
   input: {
     flex: 1, // Faz com que o campo de entrada ocupe todo o espaço disponível dentro do contêiner.

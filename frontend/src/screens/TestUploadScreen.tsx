@@ -8,6 +8,7 @@ import {
   Modal,
   Dimensions,
 } from "react-native"; // Importa componentes do React Native para construção da interface
+import logoBase64 from "../assets/logoBase64";
 import * as ImagePicker from "expo-image-picker"; // Importa o ImagePicker para selecionar imagens da galeria
 import { useNavigation, NavigationProp } from "@react-navigation/native"; // Importa hooks e tipos para navegação
 import { RootStackParamList } from "../navigation/types"; // Tipagem de navegação para parâmetros
@@ -171,7 +172,7 @@ const MultipleImageUploadScreen = () => {
 
       {/* Exibe o logo */}
       <Image
-        source={require("../assets/images/logo.png")}
+        source={{ uri: logoBase64 }}
         style={styles.logo}
       />
 

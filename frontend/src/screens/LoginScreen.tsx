@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import { View, TextInput, TouchableOpacity, Text, Image } from "react-native";
+import logoBase64 from "../assets/logoBase64"; // Importe a string Base64
 import { UserContext } from "../contexts/UserContext"; // Importa o contexto de usuário para usar os dados de usuário
 import { LoginScreenNavigationProp } from "../navigation/types"; // Tipagem para a navegação
 import CustomAlert from "../components/CustomAlert"; // Componente de alerta customizado para mostrar erros
@@ -66,8 +67,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
       {/* Exibe o logo da aplicação */}
       <Image
-        source={require("../assets/images/logo.png")} // Caminho para o logo
-        style={styles.logo} // Estilo aplicado ao logo
+        source={{ uri: logoBase64 }}
+        style={styles.logo}
       />
 
       {/* Campo de entrada para o nome de usuário */}

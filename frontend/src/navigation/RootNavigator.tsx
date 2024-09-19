@@ -17,7 +17,10 @@ const RootNavigator = () => {
     // Envolve o navegador com o container de navegação
     <NavigationContainer>
       {/* Cria o Stack Navigator e define a rota inicial como "Login" */}
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{ headerShown: false }} // Oculta o header para todas as telas
+      >
         {/* Tela de Login */}
         <Stack.Screen name="Login" component={LoginScreen} />
 

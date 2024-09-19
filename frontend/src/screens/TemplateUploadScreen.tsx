@@ -1,5 +1,6 @@
 import React, { useState } from "react"; // Importa React e o hook useState para gerenciar estados
 import { View, Image, TouchableOpacity, Text, Modal } from "react-native"; // Importa componentes básicos do React Native para interface
+import logoBase64 from "../assets/logoBase64"; // Importe a string Base64
 import * as ImagePicker from "expo-image-picker"; // Importa a biblioteca ImagePicker para seleção de imagens
 import { useNavigation, NavigationProp } from "@react-navigation/native"; // Importa hooks e tipos para navegação
 import { RootStackParamList } from "../navigation/types"; // Tipagem de navegação para os parâmetros da pilha de navegação
@@ -75,7 +76,7 @@ const ImageUploadScreen = () => {
 
       {/* Exibe o logo da aplicação */}
       <Image
-        source={require("../assets/images/logo.png")}
+        source={{ uri: logoBase64 }}
         style={styles.logo}
       />
 

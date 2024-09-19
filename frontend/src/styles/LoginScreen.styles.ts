@@ -9,13 +9,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#e9ecef", // Cor de fundo cinza claro
   },
   logo: {
-    width: 150, // Largura do logo
-    height: 150, // Altura do logo
-    marginBottom: 40, // Espaçamento abaixo do logo
-    resizeMode: "contain", // Garante que o logo mantenha suas proporções
-    backgroundColor: "#007bff", // Define o fundo azul ao redor do logo
-    borderRadius: 75, // Bordas arredondadas para criar um fundo circular
-    padding: 20, // Espaçamento interno ao redor do logo para dar margem ao conteúdo
+    width: 200, // Define a largura do logo como 150 unidades.
+    height: 200, // Define a altura do logo como 150 unidades.
+    resizeMode: "contain", // Faz com que o logo mantenha suas proporções ao ser redimensionado dentro do espaço disponível.
+    marginBottom: 40,
   },
   inputContainer: {
     flexDirection: "row", // Organiza o conteúdo em linha
