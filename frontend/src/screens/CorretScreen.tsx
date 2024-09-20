@@ -65,10 +65,10 @@ const HomeScreen = () => {
   // Função para corrigir provas e mostrar os resultados
   const handleCorrectTests = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/corrigir-prova", {
+      const response = await fetch("http://192.168.1.180:3000/api/corrigir-prova", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
         body: JSON.stringify({
           /* Dados da prova */
@@ -103,7 +103,7 @@ const HomeScreen = () => {
   // Função para enviar o resultado por e-mail
   const handleSendEmail = async () => {
     try {
-      await fetch("http://localhost:3000/api/enviar-resultado", {
+      await fetch("http://192.168.1.180:3000/api/enviar-resultado", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -6,7 +6,7 @@ export type RootStackParamList = {
   Register: undefined; // Tela de Registro não aceita parâmetros
   ImageUpload: undefined; // Tela de Upload de Imagem não aceita parâmetros
   TestUploadScreen: undefined; // Tela de Upload de Provas não aceita parâmetros
-  CorrectScreen: undefined; // Tela de Correção de Provas não aceita parâmetros
+  CorrectScreen: { resultado: { images: string[] } }; // Ajuste aqui para aceitar o parâmetro
   TemplateUploadScreen: undefined; // Tela de Upload de Template não aceita parâmetros
 };
 

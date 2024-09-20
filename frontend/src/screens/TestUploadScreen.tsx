@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // Importa React e o hook useState para gerenciamento de estado
+import React, { useState } from "react";
 import {
   Image,
   View,
@@ -7,26 +7,23 @@ import {
   Text,
   Modal,
   Dimensions,
-} from "react-native"; // Importa componentes do React Native para construção da interface
+} from "react-native";
 import logoBase64 from "../assets/logoBase64";
-import * as ImagePicker from "expo-image-picker"; // Importa o ImagePicker para selecionar imagens da galeria
-import { useNavigation, NavigationProp } from "@react-navigation/native"; // Importa hooks e tipos para navegação
-import { RootStackParamList } from "../navigation/types"; // Tipagem de navegação para parâmetros
-import CustomAlert from "../components/CustomAlert"; // Componente de alerta personalizado
-import styles from "../styles/TestUploadScreen.styles"; // Importa os estilos da tela
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../navigation/types";
+import CustomAlert from "../components/CustomAlert";
+import styles from "../styles/TestUploadScreen.styles";
 
-// Obtém as dimensões da tela do dispositivo
 const { width: screenWidth } = Dimensions.get("window");
-// Define a quantidade de imagens por página
 const IMAGES_PER_PAGE = 6;
 
 const MultipleImageUploadScreen = () => {
-  // Estados para armazenar informações sobre as imagens e a interface
-  const [imageUris, setImageUris] = useState<string[]>([]); // Armazena URIs das imagens selecionadas
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0); // Índice da imagem atualmente selecionada
-  const [modalVisible, setModalVisible] = useState<boolean>(false); // Controle de visibilidade do modal
-  const [currentPage, setCurrentPage] = useState<number>(0); // Controle da página atual de imagens
-  const [alertVisible, setAlertVisible] = useState(false); // Controle de visibilidade do alerta
+  const [imageUris, setImageUris] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [alertVisible, setAlertVisible] = useState(false);
   const [alertData, setAlertData] = useState<{
     title: string;
     message: string;
@@ -35,17 +32,15 @@ const MultipleImageUploadScreen = () => {
       onPress: () => void;
       style?: "default" | "cancel" | "destructive";
     }[];
-  }>({ title: "", message: "" }); // Dados do alerta
+  }>({ title: "", message: "" });
+  const [pontuacaoTotal, setPontuacaoTotal] = useState<number | null>(null);
 
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); // Hook para navegação entre telas
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // Função assíncrona para selecionar imagens
   const selectImages = async () => {
-    // Solicita permissão para acessar a galeria de imagens
     const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!result.granted) {
-      // Exibe alerta caso a permissão seja negada
       setAlertData({
         title: "Permissão necessária",
         message: "Permissão para acessar a galeria é necessária!",
@@ -54,24 +49,20 @@ const MultipleImageUploadScreen = () => {
       return;
     }
 
-    // Abre a galeria para seleção de imagens
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Apenas imagens
-      allowsMultipleSelection: true, // Permite seleção múltipla
-      quality: 1, // Qualidade da imagem
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 1,
     });
 
     if (!pickerResult.canceled && pickerResult.assets) {
       const newUris: string[] = [];
-
-      // Adiciona novas imagens, evitando duplicatas
       pickerResult.assets.forEach((asset) => {
         if (!imageUris.includes(asset.uri)) {
           newUris.push(asset.uri);
         }
       });
 
-      // Exibe alerta se houver imagens duplicadas
       if (newUris.length < pickerResult.assets.length) {
         setAlertData({
           title: "Imagem duplicada",
@@ -80,61 +71,70 @@ const MultipleImageUploadScreen = () => {
         });
         setAlertVisible(true);
       }
-
-      // Atualiza o estado com as novas URIs
       setImageUris([...imageUris, ...newUris]);
     }
   };
 
-  // Função para abrir o modal de visualização da imagem
-  const openImageModal = (index: number) => {
-    setSelectedImageIndex(index + currentPage * IMAGES_PER_PAGE); // Define a imagem selecionada
-    setModalVisible(true); // Exibe o modal
+  const handleTestUpload = async () => {
+    const formData = new FormData();
+    imageUris.forEach((uri, index) => {
+      formData.append(`prova_${index}`, {
+        uri,
+        type: "image/jpeg",
+        name: `prova_${index}.jpg`,
+      });
+    });
+
+    try {
+      const response = await fetch(
+        "http://192.168.1.180:3000/api/corrigir-prova",
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const data = await response.json();
+      if (
+        data &&
+        data.resultado &&
+        data.resultado.pontuacaoTotal !== undefined
+      ) {
+        setPontuacaoTotal(data.resultado.pontuacaoTotal);
+      }
+    } catch (error) {
+      console.error("Erro ao enviar a prova:", error);
+    }
   };
 
-  // Função para fechar o modal
+  const openImageModal = (index: number) => {
+    setSelectedImageIndex(index + currentPage * IMAGES_PER_PAGE);
+    setModalVisible(true);
+  };
+
   const handleCloseModal = () => {
     setModalVisible(false);
   };
 
-  // Função para navegar para a tela de correção de provas
-  const handleNavigateToCorrectScreen = () => {
-    setAlertData({
-      title: "Inserir Mais Provas",
-      message: "Deseja inserir mais provas?",
-      buttons: [
-        {
-          text: "Não",
-          onPress: () => navigation.navigate("CorrectScreen"), // Navega para a tela de correção
-          style: "destructive",
-        },
-        { text: "Sim", onPress: () => {}, style: "default" }, // Mantém o alerta aberto se sim
-      ],
-    });
-    setAlertVisible(true); // Exibe o alerta
-  };
-
-  // Função para ir para a próxima página de imagens
   const handleNextPage = () => {
     if ((currentPage + 1) * IMAGES_PER_PAGE < imageUris.length) {
       setCurrentPage(currentPage + 1);
     }
   };
 
-  // Função para voltar à página anterior de imagens
   const handlePreviousPage = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
   };
 
-  // Função para controlar o scroll das imagens no modal
   const handleScroll = (event: any) => {
-    const index = Math.floor(event.nativeEvent.contentOffset.x / screenWidth); // Calcula o índice da imagem com base no scroll
+    const index = Math.floor(event.nativeEvent.contentOffset.x / screenWidth);
     setSelectedImageIndex(index);
   };
 
-  // Renderiza os botões de paginação se houver mais de uma página de imagens
   const renderPaginationButtons = () => {
     if (imageUris.length > IMAGES_PER_PAGE) {
       return (
@@ -161,7 +161,6 @@ const MultipleImageUploadScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Alerta personalizado */}
       <CustomAlert
         visible={alertVisible}
         title={alertData.title}
@@ -170,18 +169,12 @@ const MultipleImageUploadScreen = () => {
         buttons={alertData.buttons}
       />
 
-      {/* Exibe o logo */}
-      <Image
-        source={{ uri: logoBase64 }}
-        style={styles.logo}
-      />
+      <Image source={{ uri: logoBase64 }} style={styles.logo} />
 
-      {/* Botão para selecionar imagens */}
       <TouchableOpacity style={styles.button} onPress={selectImages}>
         <Text style={styles.buttonText}>Inserir Provas</Text>
       </TouchableOpacity>
 
-      {/* Container de imagens selecionadas */}
       <View style={styles.imageContainer}>
         {imageUris
           .slice(
@@ -195,10 +188,8 @@ const MultipleImageUploadScreen = () => {
           ))}
       </View>
 
-      {/* Renderiza os botões de paginação se necessário */}
       {imageUris.length > 0 && renderPaginationButtons()}
 
-      {/* Modal para visualização das imagens em tela cheia */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -221,7 +212,6 @@ const MultipleImageUploadScreen = () => {
               />
             ))}
           </ScrollView>
-          {/* Botão para fechar o modal */}
           <TouchableOpacity
             style={styles.closeButton}
             onPress={handleCloseModal}
@@ -231,15 +221,14 @@ const MultipleImageUploadScreen = () => {
         </View>
       </Modal>
 
-      {/* Botão para navegar para a tela de correção de provas */}
-      <TouchableOpacity
-        style={[styles.button, styles.darkBlueButton]}
-        onPress={handleNavigateToCorrectScreen}
-      >
-        <Text style={styles.buttonText}>Ir para Corrigir Provas</Text>
+      <TouchableOpacity style={styles.button} onPress={handleTestUpload}>
+        <Text style={styles.buttonText}>Enviar Prova</Text>
       </TouchableOpacity>
 
-      {/* Botão para voltar à tela anterior */}
+      {pontuacaoTotal !== null && (
+        <Text style={styles.resultText}>Pontuação Total: {pontuacaoTotal}</Text>
+      )}
+
       <TouchableOpacity
         style={[styles.button, styles.lightRedButton]}
         onPress={() => navigation.navigate("TemplateUploadScreen")}
@@ -250,4 +239,4 @@ const MultipleImageUploadScreen = () => {
   );
 };
 
-export default MultipleImageUploadScreen; // Exporta o componente para ser utilizado em outras partes do aplicativo
+export default MultipleImageUploadScreen;

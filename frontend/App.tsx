@@ -1,5 +1,3 @@
-// App.tsx
-
 import React from "react";
 import { UserProvider } from "./src/contexts/UserContext"; // Importa o UserProvider que envolve o contexto de usuário
 import AppNavigator from "./src/navigation/RootNavigator"; // Importa o componente de navegação principal da aplicação

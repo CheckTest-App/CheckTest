@@ -87,6 +87,11 @@ const styles = StyleSheet.create({
     flex: 1, // Faz com que cada botão de paginação ocupe o espaço disponível igualmente.
     marginHorizontal: 5, // Adiciona um espaçamento horizontal de 5 unidades entre os botões de paginação.
   },
+  resultText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+  },
 });
 
 export default styles; // Exporta os estilos para serem utilizados em outros componentes.

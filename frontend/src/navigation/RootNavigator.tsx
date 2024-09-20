@@ -6,41 +6,22 @@ import RegisterScreen from "../screens/RegisterScreen";
 import ImageUploadScreen from "../screens/TemplateUploadScreen";
 import TestUploadScreen from "../screens/TestUploadScreen";
 import CorrectScreen from "../screens/CorretScreen";
-import { RootStackParamList } from "../navigation/types"; // Importa a tipagem das rotas
+import { RootStackParamList } from "../navigation/types";
 
-// Cria o Stack Navigator tipado corretamente com RootStackParamList
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-// Função principal do componente de navegação
 const RootNavigator = () => {
   return (
-    // Envolve o navegador com o container de navegação
     <NavigationContainer>
-      {/* Cria o Stack Navigator e define a rota inicial como "Login" */}
       <Stack.Navigator
         initialRouteName="Login"
-        screenOptions={{ headerShown: false }} // Oculta o header para todas as telas
+        screenOptions={{ headerShown: false }}
       >
-        {/* Tela de Login */}
         <Stack.Screen name="Login" component={LoginScreen} />
-
-        {/* Tela de Registro */}
         <Stack.Screen name="Register" component={RegisterScreen} />
-
-        {/* Tela de Upload de Imagem */}
         <Stack.Screen name="ImageUpload" component={ImageUploadScreen} />
-
-        {/* Tela de Upload de Provas */}
         <Stack.Screen name="TestUploadScreen" component={TestUploadScreen} />
-
-        {/* Tela de Correção de Provas */}
         <Stack.Screen name="CorrectScreen" component={CorrectScreen} />
-
-        {/* Tela de Upload de Template */}
-        <Stack.Screen
-          name="TemplateUploadScreen"
-          component={ImageUploadScreen}
-        />
       </Stack.Navigator>
     </NavigationContainer>
   );

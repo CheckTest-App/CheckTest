@@ -1,98 +1,126 @@
-import React, { useState } from "react"; // Importa React e o hook useState para gerenciar estados
-import { View, Image, TouchableOpacity, Text, Modal } from "react-native"; // Importa componentes básicos do React Native para interface
-import logoBase64 from "../assets/logoBase64"; // Importe a string Base64
-import * as ImagePicker from "expo-image-picker"; // Importa a biblioteca ImagePicker para seleção de imagens
-import { useNavigation, NavigationProp } from "@react-navigation/native"; // Importa hooks e tipos para navegação
-import { RootStackParamList } from "../navigation/types"; // Tipagem de navegação para os parâmetros da pilha de navegação
-import CustomAlert from "../components/CustomAlert"; // Componente personalizado para exibição de alertas
-import styles from "../styles/TemplateUploadScreen.styles"; // Importa os estilos para a tela de upload de imagem
+import React, { useState } from "react";
+import { View, Image, TouchableOpacity, Text, Modal } from "react-native";
+import logoBase64 from "../assets/logoBase64";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../navigation/types";
+import CustomAlert from "../components/CustomAlert";
+import styles from "../styles/TemplateUploadScreen.styles";
 
-// Componente funcional para a tela de upload de imagem
-const ImageUploadScreen = () => {
-  // Estado para armazenar a URI da imagem selecionada
+const TemplateUploadScreen = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
-  // Estado para controlar a visibilidade do modal de visualização da imagem
+  const [secondImageUri, setSecondImageUri] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  // Estado para controlar a visibilidade do alerta personalizado
   const [alertVisible, setAlertVisible] = useState(false);
-  // Estado para armazenar os dados (título e mensagem) do alerta
   const [alertData, setAlertData] = useState({ title: "", message: "" });
-
-  // Hook para navegação entre telas
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // Função assíncrona para selecionar uma imagem da galeria
-  const selectImage = async () => {
-    // Solicita permissão para acessar a galeria de imagens do dispositivo
+  const selectImage = async (
+    setImage: React.Dispatch<React.SetStateAction<string | null>>
+  ) => {
     const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    // Verifica se a permissão foi negada e exibe um alerta se necessário
     if (!result.granted) {
       setAlertData({
-        title: "Permissão necessária", // Título do alerta
-        message: "Permissão para acessar a galeria é necessária!", // Mensagem do alerta
+        title: "Permissão necessária",
+        message: "Permissão para acessar a galeria é necessária!",
       });
-      setAlertVisible(true); // Exibe o alerta
-      return; // Interrompe a execução da função
+      setAlertVisible(true);
+      return;
     }
 
-    // Verifica se já existe uma imagem selecionada e exibe um alerta se necessário
-    if (imageUri) {
-      setAlertData({
-        title: "Limite atingido", // Título do alerta
-        message: "Você só pode selecionar uma imagem.", // Mensagem do alerta
-      });
-      setAlertVisible(true); // Exibe o alerta
-      return; // Interrompe a execução da função
-    }
-
-    // Abre a galeria para o usuário selecionar uma imagem
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Limita a seleção a imagens
-      allowsEditing: false, // Não permite edição da imagem
-      quality: 1, // Define a qualidade da imagem selecionada
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
     });
 
-    // Verifica se o usuário cancelou a seleção e se há uma imagem válida
-    if (
-      !pickerResult.canceled &&
-      pickerResult.assets &&
-      pickerResult.assets.length > 0
-    ) {
-      // Atualiza o estado com a URI da imagem selecionada
-      setImageUri(pickerResult.assets[0].uri);
+    if (!pickerResult.canceled && pickerResult.assets.length > 0) {
+      setImage(pickerResult.assets[0].uri);
+    }
+  };
+
+  const handleGabaritoUpload = async () => {
+    if (!imageUri || !secondImageUri) {
+      console.error(
+        "Ambas as imagens (gabarito e prova) devem ser selecionadas"
+      );
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("gabarito", {
+      uri: imageUri,
+      type: "image/jpeg",
+      name: "gabarito.jpg",
+    });
+
+    formData.append("prova", {
+      uri: secondImageUri,
+      type: "image/jpeg",
+      name: "prova.jpg",
+    });
+
+    try {
+      const response = await fetch(
+        "http://192.168.1.180:3000/api/corrigir-prova",
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error("Erro ao enviar gabarito:", error);
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Componente de alerta personalizado */}
       <CustomAlert
         visible={alertVisible}
         title={alertData.title}
         message={alertData.message}
         onClose={() => setAlertVisible(false)}
       />
+      <Image source={{ uri: logoBase64 }} style={styles.logo} />
 
-      {/* Exibe o logo da aplicação */}
-      <Image
-        source={{ uri: logoBase64 }}
-        style={styles.logo}
-      />
-
-      {/* Botão para selecionar uma imagem */}
-      <TouchableOpacity style={styles.button} onPress={selectImage}>
-        <Text style={styles.buttonText}>Inserir Gabarito</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => selectImage(setImageUri)}
+      >
+        <Text style={styles.buttonText}>Selecionar Gabarito</Text>
       </TouchableOpacity>
-
-      {/* Verifica se uma imagem foi selecionada e exibe um preview da imagem */}
       {imageUri && (
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <>
           <Image source={{ uri: imageUri }} style={styles.uploadedImage} />
+        </>
+      )}
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => selectImage(setSecondImageUri)}
+      >
+        <Text style={styles.buttonText}>Selecionar Prova</Text>
+      </TouchableOpacity>
+      {secondImageUri && (
+        <>
+          <Image
+            source={{ uri: secondImageUri }}
+            style={styles.uploadedImage}
+          />
+        </>
+      )}
+
+      {imageUri && secondImageUri && (
+        <TouchableOpacity style={styles.button} onPress={handleGabaritoUpload}>
+          <Text style={styles.buttonText}>Enviar Gabarito e Prova</Text>
         </TouchableOpacity>
       )}
 
-      {/* Modal para exibir a imagem em tela cheia */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -100,7 +128,6 @@ const ImageUploadScreen = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          {/* Botão para fechar o modal */}
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setModalVisible(false)}
@@ -113,7 +140,6 @@ const ImageUploadScreen = () => {
         </View>
       </Modal>
 
-      {/* Botão para navegar para a tela de inserção de provas */}
       <TouchableOpacity
         style={[styles.button, styles.darkBlueButton]}
         onPress={() => navigation.navigate("TestUploadScreen")}
@@ -124,4 +150,4 @@ const ImageUploadScreen = () => {
   );
 };
 
-export default ImageUploadScreen;
+export default TemplateUploadScreen;
