@@ -33,7 +33,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ff6b6b", // Define a cor de fundo vermelho claro para o botão de voltar para envio de provas.
   },
   logoutButton: {
-    backgroundColor: "#dc3545", // Define a cor de fundo vermelha para o botão de logout, indicando uma ação crítica.
+    backgroundColor: "#FF4D4D", // Cor vermelha para destaque
+    paddingVertical: 12, // Adiciona 12 unidades de espaçamento interno vertical para aumentar a altura do botão.
+    paddingHorizontal: 20, // Adiciona 20 unidades de espaçamento interno horizontal.
+    borderRadius: 8, // Define bordas arredondadas para o botão com raio de 8 unidades.
+    alignItems: "center", // Centraliza o texto dentro do botão horizontalmente.
+    justifyContent: "center", // Centraliza o texto dentro do botão verticalmente.
   },
   buttonText: {
     color: "#fff", // Define a cor do texto dos botões como branca.

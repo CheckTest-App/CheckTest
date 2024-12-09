@@ -221,13 +221,14 @@ const MultipleImageUploadScreen = () => {
         </View>
       </Modal>
 
-      <TouchableOpacity style={styles.button} onPress={handleTestUpload}>
-        <Text style={styles.buttonText}>Enviar Prova</Text>
+      <TouchableOpacity
+        style={[styles.button, styles.button]}
+        onPress={() =>
+          navigation.navigate("CorrectScreen", { resultado: { images: [] } })
+        }
+      >
+        <Text style={styles.buttonText}>Ir para Correção</Text>
       </TouchableOpacity>
-
-      {pontuacaoTotal !== null && (
-        <Text style={styles.resultText}>Pontuação Total: {pontuacaoTotal}</Text>
-      )}
 
       <TouchableOpacity
         style={[styles.button, styles.lightRedButton]}

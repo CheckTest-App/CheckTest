@@ -15,6 +15,7 @@ type UserContextType = {
   addUser: (user: User) => void;
   setLoggedInUser: (user: User) => void;
   loadUsers: () => void;
+  logout: () => void;
 };
 
 export const UserContext = createContext<UserContextType | undefined>(
@@ -29,6 +30,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     loadUsers();
+    checkLoggedInUser();
   }, []);
 
   const loadUsers = async () => {
@@ -42,6 +44,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const checkLoggedInUser = async () => {
+    try {
+      const storedLoggedInUser = await AsyncStorage.getItem("loggedInUser");
+      if (storedLoggedInUser) {
+        setLoggedInUser(JSON.parse(storedLoggedInUser));
+      }
+    } catch (error) {
+      console.error("Erro ao verificar usuário logado", error);
+    }
+  };
+
   const addUser = async (user: User) => {
     const updatedUsers = [...users, user];
     setUsers(updatedUsers);
@@ -52,9 +65,34 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const setLoggedInUserWithPersistence = async (user: User) => {
+    setLoggedInUser(user);
+    try {
+      await AsyncStorage.setItem("loggedInUser", JSON.stringify(user));
+    } catch (error) {
+      console.error("Erro ao salvar usuário logado", error);
+    }
+  };
+
+  const logout = async () => {
+    setLoggedInUser(null);
+    try {
+      await AsyncStorage.removeItem("loggedInUser");
+    } catch (error) {
+      console.error("Erro ao realizar logout", error);
+    }
+  };
+
   return (
     <UserContext.Provider
-      value={{ users, loggedInUser, addUser, setLoggedInUser, loadUsers }}
+      value={{
+        users,
+        loggedInUser,
+        addUser,
+        setLoggedInUser: setLoggedInUserWithPersistence,
+        loadUsers,
+        logout,
+      }}
     >
       {children}
     </UserContext.Provider>

@@ -101,10 +101,10 @@ const TemplateUploadScreen = () => {
       )}
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => selectImage(setSecondImageUri)}
+        style={[styles.button, styles.button]}
+        onPress={() => navigation.navigate("TestUploadScreen")}
       >
-        <Text style={styles.buttonText}>Selecionar Prova</Text>
+        <Text style={styles.buttonText}>Ir para enviar prova</Text>
       </TouchableOpacity>
       {secondImageUri && (
         <>
@@ -139,13 +139,6 @@ const TemplateUploadScreen = () => {
           )}
         </View>
       </Modal>
-
-      <TouchableOpacity
-        style={[styles.button, styles.darkBlueButton]}
-        onPress={() => navigation.navigate("TestUploadScreen")}
-      >
-        <Text style={styles.buttonText}>Ir para inserir provas</Text>
-      </TouchableOpacity>
     </View>
   );
 };

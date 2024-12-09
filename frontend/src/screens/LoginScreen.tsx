@@ -32,25 +32,19 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
   // Função que realiza a tentativa de login
   const handleLogin = () => {
-    // Checa se o nome de usuário e senha são "A"
-    if (username === "A" && password === "A") {
-      navigation.navigate("ImageUpload"); // Se as credenciais estiverem corretas, navega para a tela de upload de imagem
-      return;
-    }
-
-    // Busca um usuário na lista de usuários que corresponda ao nome de usuário e senha fornecidos
     const user = users.find(
       (u: { username: string; password: string }) =>
         u.username === username && u.password === password
     );
 
-    // Se o usuário for encontrado, navega para a tela de upload de imagem
     if (user) {
+      if (userContext.setLoggedInUser) {
+        userContext.setLoggedInUser(user); // Define o usuário como logado
+      }
       navigation.navigate("ImageUpload");
     } else {
-      // Caso contrário, exibe uma mensagem de erro e o alerta
       setAlertMessage("Nome de usuário ou senha incorretos!");
-      setAlertVisible(true); // Torna o alerta visível
+      setAlertVisible(true);
     }
   };
 
@@ -66,10 +60,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       />
 
       {/* Exibe o logo da aplicação */}
-      <Image
-        source={{ uri: logoBase64 }}
-        style={styles.logo}
-      />
+      <Image source={{ uri: logoBase64 }} style={styles.logo} />
 
       {/* Campo de entrada para o nome de usuário */}
       <View style={styles.inputContainer}>

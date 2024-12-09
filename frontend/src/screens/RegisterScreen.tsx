@@ -95,16 +95,19 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     const newUser = { name, email, phone, username, password };
-    if (addUser) {
+
+    if (addUser && userContext?.setLoggedInUser) {
+      // Verifica se userContext e setLoggedInUser existem
       addUser(newUser);
+      userContext.setLoggedInUser(newUser); // Define o usuário como logado
       setAlertMessage("Usuário registrado com sucesso!");
-      navigation.navigate("Login");
+      setAlertVisible(true);
+      navigation.navigate("ImageUpload");
     } else {
       setAlertMessage("Erro ao registrar usuário.");
+      setAlertVisible(true);
     }
-    setAlertVisible(true);
   };
-
   return (
     <View style={styles.container}>
       <CustomAlert
@@ -114,10 +117,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         onClose={() => setAlertVisible(false)}
       />
 
-      <Image
-        source={{ uri: logoBase64 }}
-        style={styles.logo}
-      />
+      <Image source={{ uri: logoBase64 }} style={styles.logo} />
 
       {/* Nome Completo */}
       <View style={styles.inputWrapper}>
