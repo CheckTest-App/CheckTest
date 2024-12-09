@@ -100,7 +100,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       // Verifica se userContext e setLoggedInUser existem
       addUser(newUser);
       userContext.setLoggedInUser(newUser); // Define o usuário como logado
-      setAlertVisible(true);
       navigation.navigate("ImageUpload");
     } else {
       setAlertMessage("Erro ao registrar usuário.");
