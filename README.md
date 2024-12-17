@@ -38,7 +38,7 @@ CheckTest é um sistema de correção automática de provas utilizando OCR (Reco
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/SeuUsuario/CheckTest.git
+   git clone https://github.com/CheckTest-App/CheckTest.git
    ```
 
 2. Navegue até a pasta do backend e instale as dependências:
