@@ -1,43 +1,42 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 
-// Define as propriedades esperadas para o componente CustomAlert
-type CustomAlertProps = {
-  visible: boolean; // Controla a visibilidade do alerta
-  title: string; // Título do alerta
-  message: string; // Mensagem a ser exibida no alerta
-  onClose: () => void; // Função chamada quando o alerta é fechado
-  buttons?: {
-    // Array de botões customizados (opcional)
-    text: string; // Texto do botão
-    onPress: () => void; // Função executada ao clicar no botão
-    style?: "default" | "cancel" | "destructive"; // Estilo opcional do botão
-  }[];
+type ButtonProps = {
+  text: string;
+  onPress: () => void;
+  style?: "default" | "cancel" | "destructive";
 };
 
-// Componente funcional CustomAlert
-const CustomAlert: React.FC<CustomAlertProps> = ({
-  visible, // Define se o modal será exibido ou não
-  title, // O título do alerta
-  message, // A mensagem do alerta
-  onClose, // Função de fechamento do alerta
-  buttons = [{ text: "OK", onPress: onClose }], // Define um botão padrão caso nenhum seja passado
+type CustomAlertProps = {
+  visible: boolean;
+  title: string;
+  message: string;
+  onClose: () => void;
+  buttons?: ButtonProps[];
+};
+
+const CustomAlert: React.FC<CustomAlertProps> = ({ 
+  visible, 
+  title, 
+  message, 
+  onClose, 
+  buttons 
 }) => {
+  // UseMemo para evitar recriação de array
+  const defaultButtons = useMemo<ButtonProps[]>(() => [
+    { text: "OK", onPress: onClose }
+  ], [onClose]);
+
+  const alertButtons = buttons?.length ? buttons : defaultButtons;
+
   return (
-    // Modal que exibe o alerta, visível de acordo com a prop `visible`
-    <Modal visible={visible} transparent={true} animationType="fade">
-      {/* Tela escurecida como fundo do modal */}
+    <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
-        {/* Contêiner do alerta */}
         <View style={styles.alertContainer}>
-          {/* Título do alerta */}
           <Text style={styles.alertTitle}>{title}</Text>
-          {/* Mensagem do alerta */}
           <Text style={styles.alertMessage}>{message}</Text>
-          {/* Contêiner dos botões */}
           <View style={styles.buttonsContainer}>
-            {/* Mapeia os botões passados como props e renderiza */}
-            {buttons.map((button, index) => (
+            {alertButtons.map((button, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -46,6 +45,8 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
                   button.style === "cancel" && styles.cancelButton,
                 ]}
                 onPress={button.onPress}
+                accessibilityLabel={`Botão ${button.text}`}
+                accessible={true}
               >
                 <Text style={styles.buttonText}>{button.text}</Text>
               </TouchableOpacity>
@@ -57,56 +58,59 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   );
 };
 
-// Estilos do componente
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1, // Ocupa toda a tela
-    justifyContent: "center", // Centraliza verticalmente
-    alignItems: "center", // Centraliza horizontalmente
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fundo escurecido para o modal
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   alertContainer: {
-    width: 300, // Largura do contêiner do alerta
-    padding: 20, // Espaçamento interno
-    backgroundColor: "#fff", // Fundo branco para o alerta
-    borderRadius: 10, // Bordas arredondadas
-    alignItems: "center", // Centraliza o conteúdo
-    elevation: 5, // Sombra para dar profundidade
+    width: "85%", // Responsivo
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 5,
   },
   alertTitle: {
-    fontSize: 18, // Tamanho da fonte do título
-    fontWeight: "bold", // Negrito para o título
-    marginBottom: 10, // Espaçamento abaixo do título
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+    textAlign: "center",
   },
   alertMessage: {
-    fontSize: 16, // Tamanho da fonte da mensagem
-    color: "#495057", // Cor do texto da mensagem
-    marginBottom: 20, // Espaçamento abaixo da mensagem
-    textAlign: "center", // Centraliza o texto da mensagem
+    fontSize: 16,
+    color: "#495057",
+    marginBottom: 20,
+    textAlign: "center",
   },
   buttonsContainer: {
-    flexDirection: "row", // Organiza os botões em linha
-    justifyContent: "space-between", // Espaça os botões
+    flexDirection: "row",
+    justifyContent: "center",
+    flexWrap: "wrap", // Evita sobreposição em telas menores
   },
   button: {
-    flex: 1, // Botão ocupa o espaço disponível
-    paddingVertical: 10, // Espaçamento vertical interno
-    paddingHorizontal: 15, // Espaçamento horizontal interno
-    marginHorizontal: 5, // Espaçamento entre os botões
-    borderRadius: 5, // Bordas arredondadas
-    backgroundColor: "#007bff", // Cor de fundo azul para o botão
-    alignItems: "center", // Centraliza o texto horizontalmente
+    flex: 1,
+    minWidth: 100,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    backgroundColor: "#007bff",
+    alignItems: "center",
   },
   buttonText: {
-    color: "#fff", // Texto branco no botão
-    fontSize: 16, // Tamanho da fonte do texto do botão
+    color: "#fff",
+    fontSize: 16,
   },
   destructiveButton: {
-    backgroundColor: "#dc3545", // Cor de fundo vermelha para botões destrutivos
+    backgroundColor: "#dc3545",
   },
   cancelButton: {
-    backgroundColor: "#6c757d", // Cor de fundo cinza para botões de cancelamento
+    backgroundColor: "#6c757d",
   },
 });
 
-export default CustomAlert; // Exporta o componente
+export default CustomAlert;

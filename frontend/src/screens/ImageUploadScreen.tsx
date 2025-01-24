@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { View, Image, TouchableOpacity, Text } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  Alert,
+  Modal,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
@@ -9,7 +16,6 @@ import { RootStackParamList } from "../navigation/types";
 import CustomAlert from "../components/CustomAlert";
 import styles from "../styles/ImageUploadScreen.styles";
 
-// Interface para tipagem do alerta
 interface AlertData {
   title: string;
   message: string;
@@ -17,37 +23,41 @@ interface AlertData {
 
 const ImageUploadScreen = () => {
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [alertVisible, setAlertVisible] = useState<boolean>(false);
-  const [alertData, setAlertData] = useState<AlertData>({ title: "", message: "" });
+  const [alertData, setAlertData] = useState<AlertData>({
+    title: "",
+    message: "",
+  });
 
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   // Função para selecionar uma imagem
-  const selectImage = async (
-    setImage: React.Dispatch<React.SetStateAction<string | null>>
-  ) => {
+  const selectImage = useCallback(async () => {
     try {
-      const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!granted) {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
         setAlertData({
           title: "Permissão necessária",
-          message: "Permissão para acessar a galeria é necessária!",
+          message:
+            "Acesso à galeria é necessário para selecionar imagens. Por favor, conceda a permissão nas configurações do dispositivo.",
         });
         setAlertVisible(true);
         return;
       }
 
       const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],  // Usando o novo formato recomendado
+        mediaTypes: ["images"],
         allowsEditing: false,
         quality: 1,
       });
 
       if (!pickerResult.canceled && pickerResult.assets.length > 0) {
-        const uri = pickerResult.assets[0].uri;
-        setImage(uri);
-        console.log("Imagem selecionada:", uri);
-        await AsyncStorage.setItem("gabarito", uri);
+        const selectedUri = pickerResult.assets[0].uri;
+        setImageUri(selectedUri);
+
+        await AsyncStorage.setItem("gabarito", selectedUri);
       }
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
@@ -56,6 +66,13 @@ const ImageUploadScreen = () => {
         message: "Falha ao selecionar a imagem. Tente novamente.",
       });
       setAlertVisible(true);
+    }
+  }, []);
+
+  // Função para visualizar a imagem em tela cheia
+  const openImageModal = () => {
+    if (imageUri) {
+      setModalVisible(true);
     }
   };
 
@@ -72,19 +89,46 @@ const ImageUploadScreen = () => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => selectImage(setImageUri)}
+        onPress={selectImage}
+        accessibilityLabel="Selecionar imagem do gabarito"
       >
         <Text style={styles.buttonText}>Selecionar Gabarito</Text>
       </TouchableOpacity>
 
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.uploadedImage} />}
+      {imageUri && (
+        <TouchableOpacity onPress={openImageModal}>
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.uploadedImage}
+            accessible
+            accessibilityLabel="Imagem selecionada"
+          />
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity
         style={[styles.button, styles.darkBlueButton]}
-        onPress={() => navigation.navigate("UploadScreen")}
+        onPress={() => navigation.navigate("Upload")}
+        accessibilityLabel="Ir para tela de envio da prova"
       >
         <Text style={styles.buttonText}>Ir para enviar prova</Text>
       </TouchableOpacity>
+
+      {/* Modal para exibir a imagem em tela cheia */}
+      <Modal visible={modalVisible} transparent={true} animationType="fade">
+        <View style={styles.modalContainer}>
+          <Image
+            source={{ uri: imageUri ?? "" }}
+            style={styles.fullScreenImage}
+          />
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>Fechar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };

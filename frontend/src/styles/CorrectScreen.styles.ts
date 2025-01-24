@@ -1,51 +1,73 @@
-import { StyleSheet } from "react-native"; // Importa o módulo StyleSheet do React Native para criar estilos.
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Faz com que o contêiner ocupe todo o espaço disponível na tela.
-    justifyContent: "center", // Centraliza o conteúdo verticalmente no meio da tela.
-    alignItems: "center", // Centraliza o conteúdo horizontalmente no meio da tela.
-    padding: 20, // Adiciona um espaçamento interno de 20 unidades em todos os lados.
-    backgroundColor: "#f8f9fa", // Define uma cor de fundo suave e clara (cinza claro).
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    backgroundColor: "#f8f9fa",
   },
+
   logo: {
-    width: 200, // Define a largura do logo como 150 unidades.
-    height: 200, // Define a altura do logo como 150 unidades.
-    resizeMode: "contain", // Faz com que o logo mantenha suas proporções ao ser redimensionado dentro do espaço disponível.
-    marginBottom: 40,
+    width: 150,
+    height: 150,
+    resizeMode: "contain",
+    marginBottom: 30,
   },
+
   buttonContainer: {
-    width: "80%", // Define a largura do contêiner dos botões como 80% da largura da tela.
-    marginBottom: 20, // Adiciona um espaçamento de 20 unidades abaixo de cada botão.
+    width: "100%",
+    maxWidth: 350, // Define um limite para evitar botões muito largos em telas grandes
+    alignItems: "center",
+    marginBottom: 15, // Espaçamento entre botões
   },
+
   button: {
-    backgroundColor: "#007bff", // Define a cor de fundo padrão dos botões como azul.
-    paddingVertical: 12, // Adiciona 12 unidades de espaçamento interno vertical para aumentar a altura do botão.
-    paddingHorizontal: 20, // Adiciona 20 unidades de espaçamento interno horizontal.
-    borderRadius: 8, // Define bordas arredondadas para o botão com raio de 8 unidades.
-    alignItems: "center", // Centraliza o texto dentro do botão horizontalmente.
-    justifyContent: "center", // Centraliza o texto dentro do botão verticalmente.
+    width: "100%",
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  emailButton: {
-    backgroundColor: "#28a745", // Define a cor de fundo verde claro para o botão de enviar por email.
+
+  blueButton: {
+    backgroundColor: "#007bff",
   },
-  backButton: {
-    backgroundColor: "#ff6b6b", // Define a cor de fundo vermelho claro para o botão de voltar para envio de provas.
+
+  greenButton: {
+    backgroundColor: "#28a745",
   },
-  logoutButton: {
-    backgroundColor: "#FF4D4D", // Cor vermelha para destaque
-    paddingVertical: 12, // Adiciona 12 unidades de espaçamento interno vertical para aumentar a altura do botão.
-    paddingHorizontal: 20, // Adiciona 20 unidades de espaçamento interno horizontal.
-    borderRadius: 8, // Define bordas arredondadas para o botão com raio de 8 unidades.
-    alignItems: "center", // Centraliza o texto dentro do botão horizontalmente.
-    justifyContent: "center", // Centraliza o texto dentro do botão verticalmente.
+
+  lightRedButton: {
+    backgroundColor: "#ff6b6b",
   },
+
+  darkRedButton: {
+    backgroundColor: "#dc3545",
+  },
+
   buttonText: {
-    color: "#fff", // Define a cor do texto dos botões como branca.
-    fontSize: 16, // Define o tamanho da fonte do texto dos botões como 16 unidades.
-    fontWeight: "bold", // Define o peso da fonte como negrito para destacar o texto.
-    textAlign: "center", // Centraliza o texto dentro do botão horizontalmente.
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+
+  infoText: {
+    fontSize: 16,
+    marginTop: 20,
+    fontWeight: "bold",
+    color: "#333",
+    textAlign: "center",
   },
 });
 
-export default styles; // Exporta os estilos para serem usados em outros componentes.
+export default styles;

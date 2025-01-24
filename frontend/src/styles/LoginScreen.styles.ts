@@ -1,82 +1,123 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  // Contêiner principal da tela
   container: {
-    flex: 1, // Ocupa todo o espaço disponível verticalmente
-    justifyContent: "center", // Centraliza o conteúdo verticalmente
-    alignItems: "center", // Centraliza o conteúdo horizontalmente
-    padding: 20, // Espaçamento interno
-    backgroundColor: "#e9ecef", // Cor de fundo cinza claro
-  },
-  logo: {
-    width: 200, // Define a largura do logo como 150 unidades.
-    height: 200, // Define a altura do logo como 150 unidades.
-    resizeMode: "contain", // Faz com que o logo mantenha suas proporções ao ser redimensionado dentro do espaço disponível.
-    marginBottom: 40,
-  },
-  inputContainer: {
-    flexDirection: "row", // Organiza o conteúdo em linha
-    alignItems: "center", // Alinha os itens verticalmente no centro
-    width: "100%", // O campo de entrada ocupa toda a largura disponível
-    marginBottom: 15, // Espaçamento abaixo do campo de entrada
-    borderColor: "#adb5bd", // Cor da borda
-    borderWidth: 1, // Largura da borda
-    borderRadius: 8, // Bordas arredondadas
-    backgroundColor: "#fff", // Fundo branco para o campo de entrada
-    paddingHorizontal: 10, // Espaçamento interno nas laterais
-    elevation: 2, // Sombra para dar destaque ao campo
-  },
-  passwordContainer: {
-    flexDirection: "row", // Organiza o conteúdo em linha, semelhante ao inputContainer
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    width: "100%",
-    marginBottom: 15,
-    borderColor: "#adb5bd",
-    borderWidth: 1,
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    paddingHorizontal: 10,
-    elevation: 2,
+    padding: 20,
+    backgroundColor: "#e9ecef", 
   },
+
+  // Estilo do logo
+  logo: {
+    width: 200, 
+    height: 200, 
+    resizeMode: "contain", 
+    marginBottom: 40, // Espaço abaixo do logo
+  },
+
+  // Contêiner dos inputs
+  inputContainer: {
+    flexDirection: "row", 
+    alignItems: "center", 
+    width: "100%", 
+    marginBottom: 15, 
+    borderColor: "#adb5bd", 
+    borderWidth: 1, 
+    borderRadius: 8, 
+    backgroundColor: "#fff", 
+    paddingHorizontal: 10, 
+    elevation: 3, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
+  },
+
+  // Contêiner específico para o campo de senha
+  passwordContainer: {
+    flexDirection: "row", 
+    alignItems: "center", 
+    width: "100%", 
+    marginBottom: 15, 
+    borderColor: "#adb5bd", 
+    borderWidth: 1, 
+    borderRadius: 8, 
+    backgroundColor: "#fff", 
+    paddingHorizontal: 10, 
+    elevation: 3, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
+  },
+
+  // Estilo do campo de entrada
   input: {
-    flex: 1, // O campo de entrada ocupa todo o espaço disponível
-    paddingVertical: 10, // Espaçamento vertical dentro do campo
-    color: "#495057", // Cor do texto dentro do campo de entrada
+    flex: 1, 
+    paddingVertical: 12, 
+    color: "#495057", 
+    fontSize: 16, 
   },
+
+  // Ícone do olho no campo de senha
   eyeIcon: {
-    justifyContent: "center", // Centraliza o ícone verticalmente
-    alignItems: "center", // Centraliza o ícone horizontalmente
-    marginLeft: 10, // Espaçamento à esquerda do ícone
+    justifyContent: "center", 
+    alignItems: "center", 
+    marginLeft: 10, 
   },
+
+  // Estilo do ícone de olho
   eyeIconText: {
-    fontSize: 18, // Tamanho da fonte do ícone de olho
-    color: "#495057", // Cor do ícone de olho
+    fontSize: 18, 
+    color: "#495057", 
   },
+
+  // Texto de "Esqueci a senha"
   forgotPasswordText: {
-    color: "#007bff", // Cor do texto de "Esqueci a senha"
-    marginBottom: 20, // Espaçamento abaixo do texto
-    textAlign: "center", // Centraliza o texto horizontalmente
+    color: "#007bff", 
+    marginBottom: 20, 
+    textAlign: "center", 
+    fontSize: 14, 
+    fontWeight: "500", 
   },
+
+  // Contêiner para o botão principal
   buttonContainer: {
-    width: "80%", // O contêiner do botão ocupa 80% da largura da tela
-    marginBottom: 20, // Espaçamento abaixo do botão
-    marginTop: 10, // Espaçamento acima do botão
-    borderRadius: 8, // Bordas arredondadas
+    width: "80%", 
+    marginVertical: 15, // Espaçamento acima e abaixo do botão
+    borderRadius: 8, 
   },
+
+  // Estilo padrão dos botões
   button: {
-    backgroundColor: "#007bff", // Cor de fundo azul para os botões
-    paddingVertical: 12, // Espaçamento vertical interno dos botões
-    borderRadius: 8, // Bordas arredondadas
-    alignItems: "center", // Centraliza o texto dentro do botão horizontalmente
-    justifyContent: "center", // Centraliza o texto dentro do botão verticalmente
+    backgroundColor: "#007bff", 
+    paddingVertical: 14, 
+    borderRadius: 8, 
+    alignItems: "center", 
+    justifyContent: "center", 
+    elevation: 3, 
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
   },
+
+  // Botão de ação alternativa com cor azul escuro
   darkBlueButton: {
-    backgroundColor: "#0056b3", // Cor de fundo azul escuro para o botão de login
+    backgroundColor: "#0056b3", 
   },
+
+  // Estilo do texto do botão
   buttonText: {
-    color: "#fff", // Cor do texto dentro do botão (branco)
-    fontSize: 16, // Tamanho da fonte do texto
-    fontWeight: "bold", // O texto dentro do botão é negrito
+    color: "#fff", 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    textAlign: "center", 
+    textTransform: "uppercase", 
+    letterSpacing: 1, 
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import { View, TextInput, TouchableOpacity, Text, Image } from "react-native";
 import logoBase64 from "../assets/logoBase64";
 import { UserContext } from "../contexts/UserContext";
@@ -12,7 +12,7 @@ type Props = {
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const userContext = useContext(UserContext);
-  const { addUser } = userContext || {};
+  const { users = [], addUser } = userContext || {};
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,74 +20,57 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [errors, setErrors] = useState({
     name: "",
     email: "",
     phone: "",
+    username: "",
     password: "",
     confirmPassword: "",
   });
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
 
-  // Valida o e-mail
-  const validateEmail = (email: string) => {
+  const validateEmail = useCallback((email: string) => {
     const emailRegex = /\S+@\S+\.\S+/;
     return emailRegex.test(email);
-  };
+  }, []);
 
-  //Formata o telefone
-  const formatPhoneNumber = (input: string) => {
-    const cleaned = input.replace(/\D/g, ""); // Remove tudo que não for número
-    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
-    if (match) {
-      return `(${match[1]}) ${match[2]}-${match[3]}`; // Formato: (XX) XXXXX-XXXX
-    }
-    return input; // Retorna o valor sem formatação caso não tenha o padrão completo
-  };
-
-  // Valida o telefone
-  const validatePhone = (phone: string) => {
+  const validatePhone = useCallback((phone: string) => {
     const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
     return phoneRegex.test(phone);
-  };
+  }, []);
 
-  //Valida a visibilidade da senha
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
-
-  // Valida a força da senha
-  const validatePasswordStrength = (password: string) => {
+  const validatePasswordStrength = useCallback((password: string) => {
     return password.length >= 8;
-  };
+  }, []);
+
+  const formatPhoneNumber = useCallback((input: string) => {
+    const cleaned = input.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+    return match ? `(${match[1]}) ${match[2]}-${match[3]}` : input;
+  }, []);
 
   const handleRegister = () => {
-    let newErrors = {
-      name: "",
-      email: "",
-      phone: "",
-      password: "",
-      confirmPassword: "",
-    };
+    let newErrors = { name: "", email: "", phone: "", username: "", password: "", confirmPassword: "" };
 
-    if (!name) {
-      newErrors.name = "Nome é obrigatório.";
+    if (!name.trim()) newErrors.name = "Nome é obrigatório.";
+    if (!email || !validateEmail(email)) newErrors.email = "E-mail inválido.";
+    if (!phone || !validatePhone(phone)) newErrors.phone = "Telefone inválido. Ex: (11) 99999-9999";
+    if (!username.trim()) newErrors.username = "Nome de usuário é obrigatório.";
+    if (!validatePasswordStrength(password)) newErrors.password = "A senha deve ter no mínimo 8 caracteres.";
+    if (password !== confirmPassword) newErrors.confirmPassword = "As senhas não coincidem.";
+    
+    if (users.some((u) => u.email === email)) newErrors.email = "E-mail já cadastrado.";
+    if (users.some((u) => u.username === username)) newErrors.username = "Nome de usuário já existe.";
+    if (!users) {
+      setAlertMessage("Erro ao carregar usuários.");
+      setAlertVisible(true);
+      return;
     }
-    if (!email || !validateEmail(email)) {
-      newErrors.email = "E-mail inválido.";
-    }
-    if (!phone || !validatePhone(phone)) {
-      newErrors.phone = "Telefone inválido. Exemplo: (11) 99999-9999";
-    }
-    if (!validatePasswordStrength(password)) {
-      newErrors.password = "A senha deve ter no mínimo 8 caracteres.";
-    }
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = "As senhas não coincidem.";
-    }
-
     setErrors(newErrors);
 
-    // Se houver erros, não continuar o registro
     if (Object.values(newErrors).some((error) => error !== "")) {
       setAlertMessage("Por favor, corrija os erros.");
       setAlertVisible(true);
@@ -97,15 +80,15 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const newUser = { name, email, phone, username, password };
 
     if (addUser && userContext?.setLoggedInUser) {
-      // Verifica se userContext e setLoggedInUser existem
       addUser(newUser);
-      userContext.setLoggedInUser(newUser); // Define o usuário como logado
+      userContext.setLoggedInUser(newUser);
       navigation.navigate("ImageUpload");
     } else {
       setAlertMessage("Erro ao registrar usuário.");
       setAlertVisible(true);
     }
   };
+
   return (
     <View style={styles.container}>
       <CustomAlert
@@ -117,112 +100,86 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
       <Image source={{ uri: logoBase64 }} style={styles.logo} />
 
-      {/* Nome Completo */}
-      <View style={styles.inputWrapper}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome Completo"
-            value={name}
-            onChangeText={setName}
-          />
-        </View>
-        {errors.name ? (
-          <Text style={styles.errorText}>{errors.name}</Text>
-        ) : null}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome Completo"
+          value={name}
+          onChangeText={setName}
+          accessibilityLabel="Campo de nome completo"
+        />
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
       </View>
 
-      {/* E-mail */}
-      <View style={styles.inputWrapper}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="E-mail"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-        {errors.email ? (
-          <Text style={styles.errorText}>{errors.email}</Text>
-        ) : null}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          accessibilityLabel="Campo de e-mail"
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
       </View>
 
-      {/* Telefone */}
-      <View style={styles.inputWrapper}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Telefone"
-            value={phone}
-            onChangeText={(text) => setPhone(formatPhoneNumber(text))}
-            keyboardType="phone-pad"
-          />
-        </View>
-        {errors.phone ? (
-          <Text style={styles.errorText}>{errors.phone}</Text>
-        ) : null}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Telefone"
+          value={phone}
+          onChangeText={(text) => setPhone(formatPhoneNumber(text))}
+          keyboardType="phone-pad"
+          accessibilityLabel="Campo de telefone"
+        />
+        {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
       </View>
 
-      {/* Nome de Usuário */}
-      <View style={styles.inputWrapper}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome de Usuário"
-            value={username}
-            onChangeText={setUsername}
-          />
-        </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome de Usuário"
+          value={username}
+          onChangeText={setUsername}
+          autoCapitalize="none"
+          accessibilityLabel="Campo de nome de usuário"
+        />
+        {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
       </View>
 
-      {/* Senha */}
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
           placeholder="Senha"
           value={password}
-          secureTextEntry={secureTextEntry} // Define se a senha é oculta ou visível
+          secureTextEntry={secureTextEntry}
           onChangeText={setPassword}
+          accessibilityLabel="Campo de senha"
         />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => setSecureTextEntry(!secureTextEntry)} // Alterna o estado de visualização da senha
-        >
-          <Text style={styles.eyeIconText}>
-            {secureTextEntry ? "👁️" : "🙈"}{" "}
-            {/* Ícone alternando entre olho aberto e fechado */}
-          </Text>
+        <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
+          <Text style={styles.eyeIconText}>{secureTextEntry ? "👁️" : "🙈"}</Text>
         </TouchableOpacity>
       </View>
+      {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-      {/* Confirmar Senha */}
-      <View style={styles.inputWrapper}>
-        <View style={styles.passwordContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Confirmar Senha"
-            value={confirmPassword}
-            secureTextEntry
-            onChangeText={setConfirmPassword}
-          />
-        </View>
-        {errors.confirmPassword ? (
-          <Text style={styles.errorText}>{errors.confirmPassword}</Text>
-        ) : null}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirmar Senha"
+          value={confirmPassword}
+          secureTextEntry
+          onChangeText={setConfirmPassword}
+          accessibilityLabel="Campo de confirmação de senha"
+        />
+        {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
       </View>
 
-      {/* Botão de Registro */}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Registrar</Text>
       </TouchableOpacity>
 
-      {/* Botão para Voltar ao Login */}
-      <TouchableOpacity
-        style={[styles.button, styles.darkBlueButton]}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={[styles.button, styles.darkBlueButton]} onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Voltar ao Login</Text>
       </TouchableOpacity>
     </View>
