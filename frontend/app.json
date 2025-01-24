@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "4da0a125-e52a-4afe-a24f-210842194686"
+      }
+    },
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "owner": "analuizaaratorres",
+    "android": {
+      "package": "com.analuizaaratorres.checktest",
+      "minSdkVersion": 23,
+      "targetSdkVersion": 34,
+      "compileSdkVersion": 34,
+      "permissions": [
+      "CAMERA",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE",
+      "INTERNET"
+    ]
+    },
+    "adaptiveIcon": {
+      "foregroundImage": "./src/assets/splash.png",
+      "backgroundColor": "#ffffff"
+    }
+  }
+}

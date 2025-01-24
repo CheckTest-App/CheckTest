@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.1.100:3000/api";
+export const API_URL = "https://checktestapp-hojgzx9ip-ana-luizas-projects-2dd0be4e.vercel.app/";
 
 interface FetchOptions {
   endpoint: string;
@@ -14,7 +14,7 @@ export type ResultadoQuestao = {
 };
 
 async function apiFetch({ endpoint, method = "POST", headers = {}, body }: FetchOptions): Promise<any> {
-  const response = await fetch(`${BASE_URL}/${endpoint}`, {
+  const response = await fetch(`${API_URL}/${endpoint}`, {
     method,
     headers,
     body: body ? body : undefined,
