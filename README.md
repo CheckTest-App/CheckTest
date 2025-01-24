@@ -47,13 +47,6 @@ CheckTest é um sistema de correção automática de provas utilizando OCR (Reco
    npm install
    ```
 
-3. Configure as variáveis de ambiente:
-   - Crie um arquivo `.env` na pasta `backend` e adicione suas credenciais de e-mail e configurações:
-     ```
-     EMAIL=seu-email@gmail.com
-     EMAIL_PASSWORD=sua-senha-de-email
-     ```
-
 4. Rode o servidor backend:
    ```
    node app.js

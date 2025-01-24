@@ -3,9 +3,9 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
-import ImageUploadScreen from "../screens/TemplateUploadScreen";
-import TemplateUploadScreen from "../screens/TemplateUploadScreen";
-import TestUploadScreen from "../screens/TestUploadScreen";
+import ImageUploadScreen from "../screens/ImageUploadScreen";
+import TemplateUploadScreen from "../screens/ImageUploadScreen";
+import UploadScreen from "../screens/UploadScreen";
 import CorrectScreen from "../screens/CorrectScreen";
 import { RootStackParamList } from "../navigation/types";
 
@@ -25,7 +25,7 @@ const RootNavigator = () => {
           name="TemplateUploadScreen"
           component={TemplateUploadScreen}
         />
-        <Stack.Screen name="TestUploadScreen" component={TestUploadScreen} />
+        <Stack.Screen name="UploadScreen" component={UploadScreen} />
         <Stack.Screen name="CorrectScreen" component={CorrectScreen} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -13,12 +13,13 @@ import * as ImagePicker from "expo-image-picker";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
 import CustomAlert from "../components/CustomAlert";
-import styles from "../styles/TestUploadScreen.styles";
+import styles from "../styles/UploadScreen.styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width: screenWidth } = Dimensions.get("window");
 const IMAGES_PER_PAGE = 6;
 
-const MultipleImageUploadScreen = () => {
+const UploadScreen = () => {
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -33,8 +34,6 @@ const MultipleImageUploadScreen = () => {
       style?: "default" | "cancel" | "destructive";
     }[];
   }>({ title: "", message: "" });
-  const [pontuacaoTotal, setPontuacaoTotal] = useState<number | null>(null);
-
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const selectImages = async () => {
@@ -50,7 +49,7 @@ const MultipleImageUploadScreen = () => {
     }
 
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsMultipleSelection: true,
       quality: 1,
     });
@@ -71,41 +70,10 @@ const MultipleImageUploadScreen = () => {
         });
         setAlertVisible(true);
       }
-      setImageUris([...imageUris, ...newUris]);
-    }
-  };
 
-  const handleTestUpload = async () => {
-    const formData = new FormData();
-    imageUris.forEach((uri, index) => {
-      formData.append(`prova_${index}`, {
-        uri,
-        type: "image/jpeg",
-        name: `prova_${index}.jpg`,
-      });
-    });
-
-    try {
-      const response = await fetch(
-        "http://192.168.1.180:3000/api/corrigir-prova",
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      const data = await response.json();
-      if (
-        data &&
-        data.resultado &&
-        data.resultado.pontuacaoTotal !== undefined
-      ) {
-        setPontuacaoTotal(data.resultado.pontuacaoTotal);
-      }
-    } catch (error) {
-      console.error("Erro ao enviar a prova:", error);
+      const newImagesUris = [...imageUris, ...newUris]
+      setImageUris(newImagesUris);
+      await AsyncStorage.setItem("provas", JSON.stringify(newImagesUris));
     }
   };
 
@@ -177,10 +145,7 @@ const MultipleImageUploadScreen = () => {
 
       <View style={styles.imageContainer}>
         {imageUris
-          .slice(
-            currentPage * IMAGES_PER_PAGE,
-            (currentPage + 1) * IMAGES_PER_PAGE
-          )
+          .slice(currentPage * IMAGES_PER_PAGE, (currentPage + 1) * IMAGES_PER_PAGE)
           .map((uri, index) => (
             <TouchableOpacity key={index} onPress={() => openImageModal(index)}>
               <Image source={{ uri: uri }} style={styles.uploadedImage} />
@@ -240,4 +205,4 @@ const MultipleImageUploadScreen = () => {
   );
 };
 
-export default MultipleImageUploadScreen;
+export default UploadScreen;

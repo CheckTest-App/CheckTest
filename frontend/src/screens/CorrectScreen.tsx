@@ -13,12 +13,8 @@ import { RootStackParamList } from "../navigation/types";
 import { UserContext } from "../contexts/UserContext";
 import CustomAlert from "../components/CustomAlert";
 import styles from "../styles/CorrectScreen.styles";
-
-type ResultadoQuestao = {
-  questao: number;
-  correta: boolean;
-  valor: number;
-};
+import { corrigirProvaFetch, enviarResultadoFetch, ResultadoQuestao } from "services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -37,8 +33,8 @@ const HomeScreen = () => {
     message: "",
     buttons: [{ text: "OK", onPress: () => setAlertVisible(false) }],
   });
-  const [resultado, setResultado] = useState<ResultadoQuestao[] | null>(null);
-  const [pontuacaoTotal, setPontuacaoTotal] = useState(0);
+  const [resultados, setResultados] = useState<object>({});
+  const [responded, setResponded] = useState<boolean>(false);
 
   // Atualiza o email do usuário logado
   useEffect(() => {
@@ -57,26 +53,53 @@ const HomeScreen = () => {
   };
 
   const handleCorrectTests = async () => {
+    let data;
+
     try {
-      const response = await fetch(
-        "http://192.168.1.180:3000/api/corrigir-prova",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
+      const gabarito = await AsyncStorage.getItem("gabarito");
+      const provasStr = await AsyncStorage.getItem("provas");
+      let provas = null;
+      
+      if (provasStr) {
+        try {
+          provas = JSON.parse(provasStr);
+        } catch (error) {
+          console.error("Erro ao analisar JSON de 'provas':", error);
         }
-      );
+      }
+  
+      // Crie um FormData para enviar os arquivos
+      const formData = new FormData();
+      formData.append('gabarito', {
+        uri: gabarito,
+        type: 'image/jpeg', // ajuste o tipo conforme necessário
+        name: 'gabarito.jpg', // você pode ajustar o nome
+      });
+  
+      // Adicione as provas como arquivos
+      provas.forEach((prova: any, index: number) => {
+        formData.append('prova', {
+          uri: prova,
+          type: 'image/jpeg', // ajuste o tipo conforme necessário
+          name: `prova_${index}.jpg`, // nome do arquivo
+        });
+      });
+  
+      data = await corrigirProvaFetch(formData);
 
-      const data = await response.json();
-      setResultado(data.resultado.resultado);
-      setPontuacaoTotal(data.resultado.pontuacaoTotal);
-
+      setResponded(true);
+      setResultados(data.resultados);
+  
+      await AsyncStorage.multiRemove(['gabarito', 'provas']);
+  
       setAlertData({
         title: "Provas Corrigidas",
-        message: `Correção concluída! Pontuação total: ${data.resultado.pontuacaoTotal}`,
+        message: `Correção concluída!`,
         buttons: [{ text: "OK", onPress: () => setAlertVisible(false) }],
       });
-    } catch {
+    } catch (e) {
+      console.log(e);
+      
       setAlertData({
         title: "Erro",
         message: "Não foi possível corrigir as provas. Tente novamente.",
@@ -97,15 +120,18 @@ const HomeScreen = () => {
       return;
     }
 
-    try {
-      await fetch("http://192.168.1.180:3000/api/enviar-resultado", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: loggedInEmail,
-          resultado: { resultado, pontuacaoTotal },
-        }),
+    if (resultados == null) {
+      setAlertData({
+        title: "Erro",
+        message: "Nenhum resultado calculado.",
+        buttons: [{ text: "OK", onPress: () => setAlertVisible(false) }],
       });
+      setAlertVisible(true);
+      return;
+    }
+
+    try {
+      await enviarResultadoFetch(loggedInEmail, resultados);
 
       setAlertData({
         title: "Sucesso",
@@ -184,6 +210,7 @@ const HomeScreen = () => {
         <TouchableOpacity
           style={[styles.button, styles.emailButton]}
           onPress={confirmEmailSend}
+          disabled={!responded}
         >
           <Text style={styles.buttonText}>Enviar para Email</Text>
         </TouchableOpacity>
@@ -192,7 +219,7 @@ const HomeScreen = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.backButton]}
-          onPress={() => navigation.navigate("TestUploadScreen")}
+          onPress={() => navigation.navigate("UploadScreen")}
         >
           <Text style={styles.buttonText}>Voltar para Envio de Provas</Text>
         </TouchableOpacity>
@@ -207,17 +234,10 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {resultado && (
-        <>
-          <FlatList
-            data={resultado}
-            keyExtractor={(item) => item.questao.toString()}
-            renderItem={renderResultado}
-          />
-          <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-            Pontuação Total: {pontuacaoTotal} pontos
-          </Text>
-        </>
+      {responded && (
+        <Text style={{ fontWeight: "bold", marginTop: 20 }}>
+          Prova(s) corrigida(s) - Clique no botão de Enviar para Email para receber as correções
+        </Text>
       )}
     </View>
   );

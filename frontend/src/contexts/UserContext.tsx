@@ -31,6 +31,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     loadUsers();
     checkLoggedInUser();
+    console.log({users});
   }, []);
 
   const loadUsers = async () => {

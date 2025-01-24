@@ -58,41 +58,54 @@ app.post(
     }
 
     const gabaritoPath = path.join(__dirname, req.files["gabarito"][0].path);
-    const provaPath = path.join(__dirname, req.files["prova"][0].path);
 
     try {
-      const processedGabaritoPath = `${gabaritoPath}-processed.jpg`;
-      const processedProvaPath = `${provaPath}-processed.jpg`;
-
-      await preprocessImage(gabaritoPath, processedGabaritoPath);
-      await preprocessImage(provaPath, processedProvaPath);
-
-      const gabaritoResult = await tesseract.recognize(
-        processedGabaritoPath,
-        "por"
-      );
-      const provaResult = await tesseract.recognize(processedProvaPath, "por");
-
-      const gabaritoTexto = gabaritoResult.data.text;
-      const provaTexto = provaResult.data.text;
-
-      const gabaritoRespostas = extrairRespostas(gabaritoTexto);
-      const provaRespostas = extrairRespostas(provaTexto);
-
-      const resultadoCorrecao = compararRespostas(
-        gabaritoRespostas,
-        provaRespostas
-      );
-
-      res.json({ resultado: resultadoCorrecao });
-
-      safeUnlink(gabaritoPath);
-      safeUnlink(provaPath);
-      safeUnlink(processedGabaritoPath);
-      safeUnlink(processedProvaPath);
+      const resultados = [];
+  
+      for (const element of req.files["prova"]) {
+        const provaPath = path.join(__dirname, element.path);
+        const processedGabaritoPath = `${gabaritoPath}-processed.jpg`;
+        const processedProvaPath = `${provaPath}-processed.jpg`;
+  
+        try {
+          // Pré-processamento das imagens
+          await preprocessImage(gabaritoPath, processedGabaritoPath);
+          await preprocessImage(provaPath, processedProvaPath);
+  
+          // Reconhecimento de texto com Tesseract
+          const gabaritoResult = await tesseract.recognize(
+            processedGabaritoPath,
+            "por"
+          );
+          const provaResult = await tesseract.recognize(processedProvaPath, "por");
+  
+          // Extração e comparação de respostas
+          const gabaritoRespostas = extrairRespostas(gabaritoResult.data.text);
+          const provaRespostas = extrairRespostas(provaResult.data.text);
+          const resultadoCorrecao = compararRespostas(
+            gabaritoRespostas,
+            provaRespostas
+          );
+  
+          // Adicionar o resultado ao array de resultados
+          resultados.push({ arquivo: element.filename, resultado: resultadoCorrecao });
+  
+          // Opção para limpar arquivos temporários
+          safeUnlink(gabaritoPath);
+          safeUnlink(provaPath);
+          safeUnlink(processedGabaritoPath);
+          safeUnlink(processedProvaPath);
+        } catch (fileError) {
+          console.error(`Erro ao processar o arquivo ${element.filename}:`, fileError);
+          resultados.push({ arquivo: element.filename, erro: "Erro ao processar a imagem" });
+        }
+      }
+  
+      // Envia todos os resultados após o processamento completo
+      res.json({ resultados });
     } catch (error) {
-      console.error("Erro ao processar a imagem:", error);
-      res.status(500).json({ error: "Erro ao processar as imagens" });
+      console.error("Erro geral:", error);
+      res.status(500).json({ error: "Erro interno no processamento das imagens" });
     }
   }
 );
@@ -137,26 +150,35 @@ const compararRespostas = (gabaritoRespostas, provaRespostas) => {
 
 // Função para formatar e enviar o e-mail com o resultado
 const formatarResultadoEmail = (resultadoJson) => {
-  let resultadoTexto = resultadoJson.resultado
+  let resultadoTexto = resultadoJson
     .map(
-      (questao) =>
-        `Questão ${questao.questao}: ${
-          questao.correta ? "Correta" : "Errada"
-        } - Valor: ${questao.valor} pontos`
-    )
-    .join("\n");
+      (resultadoArquivo) => {
+        const arquivo = resultadoArquivo.arquivo;
+        const questoesTexto = resultadoArquivo.resultado.resultado
+          .map(
+            (questao) =>
+              `Questão ${questao.questao}: ${
+                questao.correta ? "Correta" : "Errada"
+              } - Valor: ${questao.valor} pontos`
+          )
+          .join("\n");
 
-  resultadoTexto += `\n\nPontuação Total: ${resultadoJson.pontuacaoTotal} pontos`;
+        return `Arquivo: ${arquivo}\n${questoesTexto}\nPontuação Total: ${resultadoArquivo.resultado.pontuacaoTotal} pontos`;
+      }
+    )
+    .join("\n\n");
 
   return resultadoTexto;
 };
 
 const enviarEmail = (email, resultadoJson) => {
   let transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "sandbox.smtp.mailtrap.io",
+    port: "2525",
+    secure: false,
     auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD,
+      user: "9317b59a972b50",
+      pass: "f9b14115aac07a",
     },
   });
 
@@ -178,20 +200,31 @@ const enviarEmail = (email, resultadoJson) => {
 
 // Rota para enviar o resultado da prova por e-mail
 app.post("/api/enviar-resultado", (req, res) => {
-  const { email, resultado } = req.body;
+  console.log(req.body);
+  const { email, resultados } = req.body;
 
-  if (!email || !resultado) {
+  if (!email || !resultados) {
     return res
       .status(400)
-      .json({ error: "E-mail e resultado são obrigatórios." });
+      .json({ error: "E-mail e resultados são obrigatórios." });
   }
 
-  enviarEmail(email, resultado);
+  console.log(resultados);
 
-  res.json({ message: "Resultado enviado com sucesso por e-mail!" });
+  try {
+    enviarEmail(email, resultados);
+    res.json({ message: "Resultados enviado com sucesso por e-mail!" });
+  } catch (error) {
+    console.error(error);
+    res.json({ message: "Erro ao enviar e-mail!" });
+  }
+});
+
+app.get("/", (req, res) => {
+  res.json({ message: "Hello world" });
 });
 
 // Iniciar o servidor
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
