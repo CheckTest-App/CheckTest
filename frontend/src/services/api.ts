@@ -1,4 +1,4 @@
-export const API_URL = "https://checktestapp-hojgzx9ip-ana-luizas-projects-2dd0be4e.vercel.app/";
+const BASE_URL = "https://checktestapp-gd9erb6fd-ana-luizas-projects-2dd0be4e.vercel.app/api";
 
 interface FetchOptions {
   endpoint: string;

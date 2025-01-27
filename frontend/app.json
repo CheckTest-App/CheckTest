@@ -5,27 +5,41 @@
         "projectId": "4da0a125-e52a-4afe-a24f-210842194686"
       }
     },
+    "name": "CheckTest",
+    "slug": "checktest",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "src/assets/logo.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./src/assets/splash.png",
+      "image": "src/assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#005FED"
     },
-    "owner": "analuizaaratorres",
+    "ios": {
+      "supportsTablet": true
+    },
     "android": {
-      "package": "com.analuizaaratorres.checktest",
-      "minSdkVersion": 23,
-      "targetSdkVersion": 34,
-      "compileSdkVersion": 34,
-      "permissions": [
-      "CAMERA",
-      "READ_EXTERNAL_STORAGE",
-      "WRITE_EXTERNAL_STORAGE",
-      "INTERNET"
-    ]
+      "adaptiveIcon": {
+        "foregroundImage": "src/assets/logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.misscoding.firebasesignin"
     },
-    "adaptiveIcon": {
-      "foregroundImage": "./src/assets/splash.png",
-      "backgroundColor": "#ffffff"
-    }
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "src/assets/logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "owner": "analuizaaratorres"
   }
 }
