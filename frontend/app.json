@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "4da0a125-e52a-4afe-a24f-210842194686"
+      }
+    },
+    "name": "CheckTest",
+    "slug": "checktest",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "src/assets/logo.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "src/assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#005FED"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "src/assets/logo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.misscoding.firebasesignin"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "src/assets/logo.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "owner": "analuizaaratorres"
+  }
+}

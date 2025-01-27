@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.1.100:3000/api";
+const BASE_URL = "https://checktestapp-gd9erb6fd-ana-luizas-projects-2dd0be4e.vercel.app/api";
 
 interface FetchOptions {
   endpoint: string;
