@@ -13,6 +13,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
+      "image": "src/assets/logo.png",
       "backgroundColor": "#ffffff"
     },
     "ios": {
