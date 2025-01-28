@@ -33,3 +33,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+backend/package-lock.json
+package-lock.json
+frontend/expo-env.d.ts

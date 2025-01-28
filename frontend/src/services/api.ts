@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.1.34/api";
+const BASE_URL = "http://192.168.1.100:4004/api";
 
 interface FetchOptions {
   endpoint: string;

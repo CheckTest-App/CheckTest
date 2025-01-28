@@ -9,20 +9,18 @@
     "slug": "checktest",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "src/assets/logo.png",
+    "icon": "src/assets/splash.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "src/assets/logo.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#005FED"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "src/assets/logo.png",
+        "foregroundImage": "src/assets/splash.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.misscoding.firebasesignin"
@@ -30,7 +28,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "src/assets/logo.png"
+      "favicon": "src/assets/splash.png"
     },
     "plugins": [
       "expo-router",

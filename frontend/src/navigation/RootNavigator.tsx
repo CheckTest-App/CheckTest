@@ -6,11 +6,10 @@ import RegisterScreen from "../screens/RegisterScreen";
 import ImageUploadScreen from "../screens/ImageUploadScreen";
 import UploadScreen from "../screens/UploadScreen";
 import CorrectScreen from "../screens/CorrectScreen";
-import { RootStackParamList } from "../navigation/types";
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator();
 
-const RootNavigator: React.FC = () => {
+const RootNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
