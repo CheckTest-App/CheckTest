@@ -74,3 +74,4 @@ CheckTest é um sistema de correção automática de provas utilizando OCR (Reco
 - Obs: inserir no arquivo api.ts em frontend/src/services o ip referente ao ip da máquina local para teste. 
 - Pode ser consultado via comando, abra o terminal e digite 'ipconfig', o ip referente ao Endereço IPv4 deve ser inserido. 
 - Exemplo: http://192.168.1.100 , deixar com o padrão de porta 4004 e caminho /api http:// SEU IPCONFIG IPV4:4004/api.
+- Em Documentos possui a prova modelo para testes, realizar o download no celular android para fazer a validação.
