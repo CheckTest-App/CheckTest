@@ -49,7 +49,7 @@ CheckTest é um sistema de correção automática de provas utilizando OCR (Reco
 
 4. Rode o servidor backend:
    ```
-   node app.js
+   npm run start
    ```
 
 5. Navegue até a pasta do frontend e instale as dependências:
@@ -60,13 +60,17 @@ CheckTest é um sistema de correção automática de provas utilizando OCR (Reco
 
 6. Inicie o Expo no frontend:
    ```
-   expo start
+   npm start
    ```
 
 7. Use o Expo Go (Android/iOS) ou um emulador para testar o aplicativo no celular.
 
 ## Como Usar
 
-- Na tela inicial, o usuário pode fazer o upload de uma imagem do gabarito e da prova.
-- Após o upload, o sistema processa as imagens e retorna a pontuação total junto com a correção de cada questão.
-- O usuário pode optar por enviar os resultados por e-mail.
+- Após realizar o cadastro de usuário, seguir com o upload de gabarito e prova para avaliação.
+- Na tela inicial após cadastro, o usuário pode fazer o upload de uma imagem do gabarito e da prova.
+- Após o upload, o sistema processa as imagens e retorna a pontuação total junto com a correção de cada questão via e-mail, necessário seguir com a confirmação do e-mail.
+- O usuário pode consultar o envio do e-mail via mailtrap para confirmação do recebimento.
+- Obs: inserir no arquivo api.ts em frontend/src/services o ip referente ao ip da máquina local para teste. 
+- Pode ser consultado via comando, abra o terminal e digite 'ipconfig', o ip referente ao Endereço IPv4 deve ser inserido. 
+- Exemplo: http://192.168.1.100 , deixar com o padrão de porta 4004 e caminho /api http:// SEU IPCONFIG IPV4:4004/api.
